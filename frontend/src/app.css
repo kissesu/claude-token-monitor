@@ -1,0 +1,186 @@
+/**
+ * @file 全局样式文件
+ * @description 包含 Tailwind CSS 指令和全局样式定义
+ * @author Atlas.oi
+ * @date 2026-01-07
+ */
+
+/* ============================================
+ * Tailwind CSS 基础指令
+ * ============================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+ * CSS 变量定义
+ * 用于主题色、间距等全局样式配置
+ * ============================================ */
+:root {
+  /* 字体设置 */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* 颜色方案 - 浅色主题 */
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #e5e5e5;
+  --color-surface-300: #d4d4d4;
+  --color-surface-400: #a3a3a3;
+  --color-surface-500: #737373;
+  --color-surface-600: #525252;
+  --color-surface-700: #404040;
+  --color-surface-800: #262626;
+  --color-surface-900: #171717;
+
+  /* 主题色 */
+  --color-primary-50: #fef2f2;
+  --color-primary-500: #ef4444;
+  --color-primary-600: #dc2626;
+  --color-primary-700: #b91c1c;
+
+  /* 间距 */
+  --spacing-unit: 0.25rem;
+
+  /* 圆角 */
+  --border-radius: 0.5rem;
+  --border-radius-lg: 1rem;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* ============================================
+ * 暗色主题配置
+ * ============================================ */
+.dark {
+  /* 反转颜色方案用于暗色主题 */
+  --color-surface-50: #171717;
+  --color-surface-100: #262626;
+  --color-surface-200: #404040;
+  --color-surface-300: #525252;
+  --color-surface-400: #737373;
+  --color-surface-500: #a3a3a3;
+  --color-surface-600: #d4d4d4;
+  --color-surface-700: #e5e5e5;
+  --color-surface-800: #1e1e1e;
+  --color-surface-900: #0a0a0a;
+
+  color-scheme: dark;
+}
+
+/* ============================================
+ * 基础元素样式重置
+ * ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* 使用系统字体渲染优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* ============================================
+ * 响应式断点
+ * sm: 640px
+ * md: 768px
+ * lg: 1024px
+ * xl: 1280px
+ * 2xl: 1536px
+ * ============================================ */
+
+/* ============================================
+ * 通用工具类
+ * ============================================ */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* ============================================
+ * 动画和过渡效果
+ * ============================================ */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ============================================
+ * 滚动条样式（WebKit 浏览器）
+ * ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-500);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--color-surface-800);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-surface-600);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-500);
+}

@@ -1,0 +1,21 @@
+# ============================================
+# Claude Token Monitor - Python 依赖配置
+# @author Atlas.oi
+# @date 2026-01-07
+# ============================================
+
+# Web 框架
+fastapi[standard]>=0.109.0
+uvicorn>=0.27.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# 异步 HTTP 客户端
+aiohttp>=3.9.0
+
+# 数据库 (异步 SQLite)
+aiosqlite>=0.19.0
+
+# 工具库
+python-dotenv>=1.0.0
+watchdog>=3.0.0
