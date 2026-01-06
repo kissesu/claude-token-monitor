@@ -375,3 +375,55 @@ async def test_performance_large_jsonl(mock_claude_dir):
 
     assert len(data) == 1000
     assert elapsed < 1.0  # 应该在 1 秒内完成
+
+
+# ============================================
+# 异常处理测试
+# ============================================
+@pytest.mark.asyncio
+async def test_read_stats_cache_permission_error(mock_claude_dir):
+    """测试文件权限错误"""
+    import os
+
+    cache_file = mock_claude_dir / "stats-cache.json"
+    cache_file.write_text("{}", encoding="utf-8")
+
+    # 修改权限为不可读（仅在 Unix 系统上有效）
+    if os.name != "nt":  # 非 Windows 系统
+        os.chmod(cache_file, 0o000)
+
+        reader = StatsReader(claude_dir=mock_claude_dir)
+        data = await reader.read_stats_cache()
+
+        assert data is None
+
+        # 恢复权限
+        os.chmod(cache_file, 0o644)
+
+
+@pytest.mark.asyncio
+async def test_parse_jsonl_with_invalid_lines(mock_claude_dir):
+    """测试包含无效行的 JSONL 文件"""
+    history_file = mock_claude_dir / "history.jsonl"
+    content = """{"valid": "line1"}
+invalid json line
+{"valid": "line2"}
+
+{"valid": "line3"}
+"""
+    history_file.write_text(content, encoding="utf-8")
+
+    reader = StatsReader(claude_dir=mock_claude_dir)
+    data = await reader.parse_jsonl_files()
+
+    # 应该只解析成功的行
+    assert len(data) == 3
+
+
+@pytest.mark.asyncio
+async def test_get_total_stats_no_cache(mock_claude_dir):
+    """测试无缓存文件时的总统计"""
+    reader = StatsReader(claude_dir=mock_claude_dir)
+    stats = await reader.get_total_stats()
+
+    assert stats is None
