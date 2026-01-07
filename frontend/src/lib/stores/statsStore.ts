@@ -13,6 +13,7 @@ import type {
   ModelUsage,
 } from '$lib/types';
 import { TimeRange, ApiStatus } from '$lib/types';
+import { calculateModelCost } from '$lib/utils/pricing';
 
 // ============================================
 // 类型定义
@@ -232,12 +233,23 @@ export const totalTokens: Readable<number> = derived(
 );
 
 /**
- * 总费用（从 current 中提取）
+ * 总费用（计算所有模型的费用总和）
  */
-export const totalCost: Readable<number> = derived(
-  statsStore,
-  ($stats) => $stats.current?.total_cost ?? 0
-);
+export const totalCost: Readable<number> = derived(statsStore, ($stats) => {
+  if (!$stats.current?.models) return 0;
+
+  // 遍历所有模型计算总费用
+  return Object.values($stats.current.models).reduce((sum, model) => {
+    const cost = calculateModelCost(
+      model.model_name,
+      model.input_tokens,
+      model.output_tokens,
+      model.cache_read_tokens,
+      model.cache_creation_tokens
+    );
+    return sum + cost;
+  }, 0);
+});
 
 /**
  * 模型使用列表（按使用量排序）
@@ -248,7 +260,37 @@ export function getModelUsageList(sortBy: ModelSortBy = 'tokens'): Readable<Mode
   return derived(statsStore, ($stats) => {
     if (!$stats.current?.models) return [];
 
-    const modelList = Object.values($stats.current.models);
+    const modelEntries = Object.values($stats.current.models);
+    const totalTokensAll = $stats.current.total_tokens || 1; // 避免除以 0
+
+    // 转换为 ModelUsage 格式并计算 cost 和 percentage
+    const modelList: ModelUsage[] = modelEntries.map((model) => {
+      const totalTokens =
+        model.input_tokens +
+        model.output_tokens +
+        model.cache_read_tokens +
+        model.cache_creation_tokens;
+
+      const cost = calculateModelCost(
+        model.model_name,
+        model.input_tokens,
+        model.output_tokens,
+        model.cache_read_tokens,
+        model.cache_creation_tokens
+      );
+
+      const percentage = (totalTokens / totalTokensAll) * 100;
+
+      return {
+        name: model.model_name,
+        input_tokens: model.input_tokens,
+        output_tokens: model.output_tokens,
+        cache_read_tokens: model.cache_read_tokens,
+        cache_creation_tokens: model.cache_creation_tokens,
+        cost,
+        percentage,
+      };
+    });
 
     // 根据排序字段排序
     return modelList.sort((a, b) => {
@@ -262,15 +304,9 @@ export function getModelUsageList(sortBy: ModelSortBy = 'tokens'): Readable<Mode
         case 'tokens':
         default:
           const aTotalTokens =
-            a.tokens.input_tokens +
-            a.tokens.output_tokens +
-            a.tokens.cache_read_tokens +
-            a.tokens.cache_creation_tokens;
+            a.input_tokens + a.output_tokens + a.cache_read_tokens + a.cache_creation_tokens;
           const bTotalTokens =
-            b.tokens.input_tokens +
-            b.tokens.output_tokens +
-            b.tokens.cache_read_tokens +
-            b.tokens.cache_creation_tokens;
+            b.input_tokens + b.output_tokens + b.cache_read_tokens + b.cache_creation_tokens;
           return bTotalTokens - aTotalTokens;
       }
     });
@@ -290,15 +326,12 @@ export const topModel: Readable<ModelUsage | null> = derived(
 
     return modelList.reduce((top, current) => {
       const topTotal =
-        top.tokens.input_tokens +
-        top.tokens.output_tokens +
-        top.tokens.cache_read_tokens +
-        top.tokens.cache_creation_tokens;
+        top.input_tokens + top.output_tokens + top.cache_read_tokens + top.cache_creation_tokens;
       const currentTotal =
-        current.tokens.input_tokens +
-        current.tokens.output_tokens +
-        current.tokens.cache_read_tokens +
-        current.tokens.cache_creation_tokens;
+        current.input_tokens +
+        current.output_tokens +
+        current.cache_read_tokens +
+        current.cache_creation_tokens;
 
       return currentTotal > topTotal ? current : top;
     });
@@ -341,7 +374,7 @@ export const cacheEfficiency: Readable<number> = derived(
 
     // 计算所有模型的缓存读取 tokens 总和
     const cacheReadTotal = Object.values($stats.current.models).reduce(
-      (sum, model) => sum + model.tokens.cache_read_tokens,
+      (sum, model) => sum + model.cache_read_tokens,
       0
     );
 

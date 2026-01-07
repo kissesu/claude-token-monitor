@@ -31,14 +31,23 @@ export interface StatsCache {
   /** 总 Token 数 */
   total_tokens: number;
 
-  /** 总费用（美元） */
-  total_cost: number;
+  /** 总费用（美元，后端可能返回 null） */
+  total_cost?: number | null;
+
+  /** 总会话数 */
+  total_sessions?: number;
 
   /** 按模型分组的使用数据 */
   models: Record<string, ModelUsage>;
 
   /** 数据更新时间（ISO 8601 格式） */
-  updated_at: string;
+  updated_at?: string;
+
+  /** 每日活动数据 */
+  daily_activities?: DailyActivity[];
+
+  /** 最后更新时间 */
+  last_updated?: string;
 }
 
 /**
@@ -49,8 +58,17 @@ export interface ModelUsage {
   /** 模型名称 */
   name: string;
 
-  /** Token 使用详情 */
-  tokens: TokenUsage;
+  /** 输入 Token 数量 */
+  input_tokens: number;
+
+  /** 输出 Token 数量 */
+  output_tokens: number;
+
+  /** 缓存读取 Token 数量 */
+  cache_read_tokens: number;
+
+  /** 缓存创建 Token 数量 */
+  cache_creation_tokens: number;
 
   /** 费用（美元） */
   cost: number;
