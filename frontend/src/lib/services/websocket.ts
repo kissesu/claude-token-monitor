@@ -396,6 +396,14 @@ class WebSocketService {
         this.handleNotification(message.data as NotificationMessage);
         break;
 
+      case WsMessageType.CONNECTED:
+        console.debug('WebSocket 连接已确认');
+        break;
+
+      case WsMessageType.HEARTBEAT:
+        console.debug('收到心跳消息');
+        break;
+
       case WsMessageType.PONG:
         console.debug('收到心跳响应');
         break;

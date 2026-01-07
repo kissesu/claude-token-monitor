@@ -36,6 +36,12 @@ export enum WsConnectionState {
  * WebSocket 消息类型
  */
 export enum WsMessageType {
+  /** 连接成功 */
+  CONNECTED = 'connected',
+
+  /** 心跳消息 */
+  HEARTBEAT = 'heartbeat',
+
   /** 统计数据更新 */
   STATS_UPDATE = 'stats_update',
 

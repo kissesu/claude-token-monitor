@@ -14,7 +14,7 @@
    */
   $: totalInputTokens = $statsStore.current
     ? Object.values($statsStore.current.models).reduce(
-        (sum, model) => sum + model.tokens.input_tokens,
+        (sum, model) => sum + model.input_tokens,
         0
       )
     : 0;
@@ -24,7 +24,7 @@
    */
   $: totalOutputTokens = $statsStore.current
     ? Object.values($statsStore.current.models).reduce(
-        (sum, model) => sum + model.tokens.output_tokens,
+        (sum, model) => sum + model.output_tokens,
         0
       )
     : 0;
@@ -34,7 +34,7 @@
    */
   $: totalCacheReadTokens = $statsStore.current
     ? Object.values($statsStore.current.models).reduce(
-        (sum, model) => sum + model.tokens.cache_read_tokens,
+        (sum, model) => sum + model.cache_read_tokens,
         0
       )
     : 0;
@@ -44,7 +44,7 @@
    */
   $: totalCacheCreationTokens = $statsStore.current
     ? Object.values($statsStore.current.models).reduce(
-        (sum, model) => sum + model.tokens.cache_creation_tokens,
+        (sum, model) => sum + model.cache_creation_tokens,
         0
       )
     : 0;
