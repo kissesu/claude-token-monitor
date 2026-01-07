@@ -116,6 +116,19 @@ class ConnectionManager:
             message: 要发送的消息字典
         """
         try:
+            # ============================================
+            # 发送前检查连接状态，避免向已关闭连接发送消息
+            # ============================================
+            if websocket.client_state != WebSocketState.CONNECTED:
+                logger.debug(
+                    f"跳过发送消息: 连接状态={websocket.client_state}, "
+                    f"client_id={self.connection_metadata.get(websocket, {}).get('client_id')}"
+                )
+                # 如果连接已断开，清理连接
+                if websocket.client_state == WebSocketState.DISCONNECTED:
+                    self.disconnect(websocket)
+                return
+
             # 确保消息包含时间戳
             if "timestamp" not in message:
                 message["timestamp"] = datetime.now().isoformat()
@@ -188,6 +201,11 @@ class ConnectionManager:
             failed_connections: 失败连接的列表（用于收集）
         """
         try:
+            # 发送前检查连接状态
+            if connection.client_state != WebSocketState.CONNECTED:
+                failed_connections.append(connection)
+                return
+
             await connection.send_json(message)
         except Exception as e:
             logger.error(f"广播消息发送失败: {e}")
@@ -269,6 +287,11 @@ class ConnectionManager:
         async def heartbeat_loop():
             while websocket in self.active_connections:
                 try:
+                    # 检查连接状态，避免向已关闭连接发送心跳
+                    if websocket.client_state != WebSocketState.CONNECTED:
+                        logger.debug("心跳任务检测到连接已断开，退出循环")
+                        break
+
                     await self.send_message(
                         websocket,
                         {
@@ -409,19 +432,29 @@ async def websocket_endpoint(websocket: WebSocket):
                 break
 
             except Exception as e:
+                # ============================================
+                # 检查连接状态，避免无限循环报错
+                # ============================================
+                if websocket.client_state == WebSocketState.DISCONNECTED:
+                    logger.info("WebSocket 连接已断开，退出消息循环")
+                    break
+
                 logger.error(f"处理消息时发生错误: {e}", exc_info=True)
 
-                # 发送错误消息
+                # 尝试发送错误消息（仅在连接仍然活跃时）
                 try:
-                    await manager.send_message(
-                        websocket,
-                        {
-                            "type": "error",
-                            "data": {"message": str(e)},
-                            "timestamp": datetime.now().isoformat(),
-                        }
-                    )
-                except:
+                    if websocket.client_state == WebSocketState.CONNECTED:
+                        await manager.send_message(
+                            websocket,
+                            {
+                                "type": "error",
+                                "data": {"message": str(e)},
+                                "timestamp": datetime.now().isoformat(),
+                            }
+                        )
+                except Exception:
+                    # 发送失败说明连接已断开，退出循环
+                    logger.info("发送错误消息失败，退出消息循环")
                     break
 
     except Exception as e:
