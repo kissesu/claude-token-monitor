@@ -404,8 +404,8 @@
 
             <!-- 格式选择 -->
             <div class="format-selection">
-              <label>导出格式</label>
-              <div class="format-options">
+              <h4 class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">导出格式</h4>
+              <div class="format-options" role="radiogroup" aria-label="导出格式选择">
                 <label class="format-option">
                   <input
                     type="radio"

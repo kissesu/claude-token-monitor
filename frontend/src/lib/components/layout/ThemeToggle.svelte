@@ -134,7 +134,6 @@
          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
          dark:focus:ring-offset-surface-800"
   aria-label={currentTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
-  aria-pressed={currentTheme === 'dark'}
   title={currentTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
   role="switch"
   aria-checked={currentTheme === 'dark'}

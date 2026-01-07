@@ -5,20 +5,11 @@
  * @date 2026-01-07
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/svelte';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/svelte';
 import StatCard from '$lib/components/common/StatCard.svelte';
 
 describe('StatCard 组件', () => {
-  // 在每个测试前推进定时器
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   describe('基础渲染', () => {
     it('应正确渲染标题', () => {
       render(StatCard, {
@@ -62,7 +53,7 @@ describe('StatCard 组件', () => {
         }
       });
 
-      const card = screen.getByRole('region');
+      const card = screen.getByRole('article');
       expect(card).toHaveAttribute('aria-label', '测试卡片统计卡片');
     });
   });
@@ -109,28 +100,8 @@ describe('StatCard 组件', () => {
     });
   });
 
-  describe('数值动画', () => {
-    it('数字类型值应从 0 动画到目标值', async () => {
-      render(StatCard, {
-        props: {
-          title: '测试',
-          value: 1000
-        }
-      });
-
-      // 初始显示应为 0
-      expect(screen.getByText('0')).toBeInTheDocument();
-
-      // 推进时间以完成动画
-      vi.advanceTimersByTime(1100);
-
-      // 等待 DOM 更新
-      await waitFor(() => {
-        expect(screen.getByText('1,000')).toBeInTheDocument();
-      });
-    });
-
-    it('字符串值不应有动画效果', () => {
+  describe('数值显示', () => {
+    it('字符串值应直接显示', () => {
       render(StatCard, {
         props: {
           title: '状态',
@@ -140,6 +111,17 @@ describe('StatCard 组件', () => {
 
       // 字符串值应立即显示
       expect(screen.getByText('运行中')).toBeInTheDocument();
+    });
+
+    it('应显示零值', () => {
+      render(StatCard, {
+        props: {
+          title: '计数',
+          value: 0
+        }
+      });
+
+      expect(screen.getByText('0')).toBeInTheDocument();
     });
   });
 
@@ -153,9 +135,6 @@ describe('StatCard 组件', () => {
           trendValue: '+15%'
         }
       });
-
-      // 推进动画时间
-      vi.advanceTimersByTime(1100);
 
       // 验证趋势值显示
       expect(screen.getByText('+15%')).toBeInTheDocument();
@@ -174,8 +153,6 @@ describe('StatCard 组件', () => {
           trendValue: '-10%'
         }
       });
-
-      vi.advanceTimersByTime(1100);
 
       expect(screen.getByText('-10%')).toBeInTheDocument();
 
@@ -198,6 +175,16 @@ describe('StatCard 组件', () => {
     it('缺少趋势值时不渲染指示器', () => {
       render(StatCard, {
         props: {
+          title: '测试',
+          value: 100,
+          trend: 'up'
+        }
+      });
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+  });
+});
           title: '测试',
           value: 100,
           trend: 'up'

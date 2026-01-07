@@ -61,7 +61,6 @@
 <!-- 页面头部容器 -->
 <header
   class="header bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 shadow-sm"
-  role="banner"
 >
   <div class="container mx-auto px-4">
     <div class="flex items-center justify-between h-16">
@@ -95,7 +94,6 @@
         <!-- 导航链接（预留，可根据需要添加） -->
         <nav
           class="flex items-center gap-4"
-          role="navigation"
           aria-label="主导航"
         >
           <!-- 未来可以在这里添加导航链接 -->
@@ -172,7 +170,6 @@
         <!-- 导航链接（预留） -->
         <nav
           class="flex flex-col gap-2 mb-4"
-          role="navigation"
           aria-label="移动端导航"
         >
           <!-- 未来可以在这里添加移动端导航链接 -->

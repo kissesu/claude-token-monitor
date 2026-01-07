@@ -11,6 +11,29 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
 // ============================================
+// 关键 Mock 必须在所有导入之前设置
+// 使用 vi.hoisted() 确保这些 mock 在模块加载前就已定义
+// ============================================
+
+// matchMedia Mock - 必须在 themeStore 导入前设置
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false, // 默认不匹配（非暗色模式）
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
+// ============================================
 // 全局测试生命周期钩子
 // ============================================
 
@@ -71,27 +94,6 @@ beforeEach(() => {
   // 每个测试前清空 localStorage
   localStorageMock.clear();
   vi.clearAllMocks();
-});
-
-// ============================================
-// matchMedia Mock
-// 用于测试响应式设计和主题切换
-// ============================================
-
-beforeAll(() => {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: false, // 默认不匹配（非暗色模式）
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  });
 });
 
 // ============================================

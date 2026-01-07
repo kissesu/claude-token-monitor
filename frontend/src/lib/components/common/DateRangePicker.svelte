@@ -160,13 +160,13 @@
   aria-labelledby="date-range-picker-title"
 >
   <!-- 快捷选项按钮组 -->
-  <div class="preset-buttons mb-4" role="group" aria-label="快捷日期选择">
-    <label
+  <div class="preset-buttons mb-4" role="group" aria-labelledby="date-range-picker-title">
+    <h3
       id="date-range-picker-title"
       class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
     >
       快捷选择
-    </label>
+    </h3>
     <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="日期范围预设选项">
       {#each presets as preset}
         <button
@@ -207,7 +207,7 @@
                focus:border-primary-500 bg-white dark:bg-surface-700
                text-surface-900 dark:text-surface-100 transition-colors"
         aria-describedby={!isValidRange && localStartDate && localEndDate ? 'date-range-error' : undefined}
-        aria-invalid={!isValidRange && localStartDate && localEndDate}
+        aria-invalid={!isValidRange && localStartDate && localEndDate ? 'true' : undefined}
         aria-required="false"
       />
     </div>
@@ -230,7 +230,7 @@
                focus:border-primary-500 bg-white dark:bg-surface-700
                text-surface-900 dark:text-surface-100 transition-colors"
         aria-describedby={!isValidRange && localStartDate && localEndDate ? 'date-range-error' : undefined}
-        aria-invalid={!isValidRange && localStartDate && localEndDate}
+        aria-invalid={!isValidRange && localStartDate && localEndDate ? 'true' : undefined}
         aria-required="false"
       />
     </div>

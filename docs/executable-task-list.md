@@ -522,11 +522,17 @@
 - [ ] 构建产物优化
 - [ ] Lighthouse 评分 >90
 
-### FE-7.4: 可访问性
-- [ ] ARIA 标签
-- [ ] 键盘导航
-- [ ] 颜色对比度
-- [ ] 屏幕阅读器支持
+### FE-7.4: 可访问性 ✅
+- [x] ARIA 标签
+- [x] 键盘导航
+- [x] 颜色对比度
+- [x] 屏幕阅读器支持
+- [x] 创建 `frontend/src/lib/utils/accessibility.ts` 工具库
+- [x] 修复所有 TypeScript 类型错误（6 个）
+- [x] 修复所有可访问性警告（11 个）
+- [x] 生产构建验证通过
+- [x] 生成 `ACCESSIBILITY_REPORT.md` 实施报告
+- [x] 生成 `ACCESSIBILITY_VALIDATION_REPORT.md` 验证报告
 
 **验收标准**: 测试通过，性能指标达标
 

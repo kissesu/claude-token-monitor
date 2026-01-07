@@ -53,10 +53,11 @@
       响应式时间范围
     </h2>
     <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label for="time-range-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         选择时间范围:
       </label>
       <select
+        id="time-range-select"
         bind:value={selectedTimeRange}
         class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md
                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100

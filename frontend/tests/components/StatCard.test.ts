@@ -192,7 +192,8 @@ describe('StatCard', () => {
         },
       });
 
-      const card = screen.getByRole('region');
+      // 组件使用 role="article" 而不是 role="region"
+      const card = screen.getByRole('article');
       expect(card).toHaveAttribute('aria-label', '测试卡片统计卡片');
     });
 

@@ -66,7 +66,7 @@
    * error 类型使用 alert role，其他类型使用 status
    */
   $: ariaRole = type === 'error' ? 'alert' : 'status';
-  $: ariaLive = type === 'error' ? 'assertive' : 'polite';
+  $: ariaLive = (type === 'error' ? 'assertive' : 'polite') as 'polite' | 'assertive';
 
   /**
    * 处理重试按钮点击

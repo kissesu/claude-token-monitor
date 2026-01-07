@@ -235,19 +235,22 @@ describe('DateRangePicker', () => {
 
   describe('无障碍性', () => {
     it('应该有正确的 ARIA 属性', () => {
-      render(DateRangePicker);
+      const { container } = render(DateRangePicker);
 
-      const picker = screen.getByRole('group');
+      // 组件有多个 role="group"，选择最外层的
+      const picker = container.querySelector('.date-range-picker');
       expect(picker).toHaveAttribute('aria-labelledby', 'date-range-picker-title');
     });
 
-    it('快捷按钮应该有 aria-pressed 属性', async () => {
+    it('快捷按钮应该有 aria-checked 属性（role="radio"）', async () => {
       render(DateRangePicker);
 
       const todayButton = screen.getByText('今日');
       await fireEvent.click(todayButton);
 
-      expect(todayButton).toHaveAttribute('aria-pressed', 'true');
+      // 组件使用 role="radio" 和 aria-checked，而不是 aria-pressed
+      expect(todayButton).toHaveAttribute('role', 'radio');
+      expect(todayButton).toHaveAttribute('aria-checked', 'true');
     });
 
     it('错误消息应该有 aria-live', async () => {

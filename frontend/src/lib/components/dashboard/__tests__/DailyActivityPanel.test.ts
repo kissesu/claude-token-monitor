@@ -5,9 +5,8 @@
  * @date 2026-01-07
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
-import { get } from 'svelte/store';
 import DailyActivityPanel from '../DailyActivityPanel.svelte';
 import { statsStore } from '$lib/stores';
 import type { DailyActivity } from '$lib/types';
@@ -146,12 +145,10 @@ describe('DailyActivityPanel', () => {
     const mockData = generateMockDailyActivities(30);
     statsStore.setDailyActivities(mockData);
 
-    const { component } = render(DailyActivityPanel);
+    render(DailyActivityPanel);
 
     // 默认应该选择"最近 7 天"
-    // 验证过滤后的数据数量
-    const state = get(component);
-    // 注意：由于组件内部状态无法直接访问，这里只能验证渲染结果
+    // 验证渲染结果
     expect(screen.getByText('最近 7 天')).toBeTruthy();
   });
 

@@ -40,7 +40,6 @@
 <!-- 页面底部容器 -->
 <footer
   class="footer bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 mt-auto"
-  role="contentinfo"
 >
   <div class="container mx-auto px-4 py-6">
     <!-- 底部内容网格布局 -->

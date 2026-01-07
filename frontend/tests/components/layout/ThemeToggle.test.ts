@@ -27,7 +27,8 @@ describe('ThemeToggle 组件', () => {
     it('应渲染主题切换按钮', () => {
       render(ThemeToggle);
 
-      const button = screen.getByRole('button');
+      // 组件使用 role="switch" 而不是 role="button"
+      const button = screen.getByRole('switch');
       expect(button).toBeInTheDocument();
     });
 
@@ -36,9 +37,9 @@ describe('ThemeToggle 组件', () => {
 
       // 等待 onMount 执行
       await waitFor(() => {
-        const button = screen.getByRole('button');
-        // 默认应该是暗色模式（aria-pressed="true"）或亮色模式（aria-pressed="false"）
-        expect(button).toHaveAttribute('aria-pressed');
+        const button = screen.getByRole('switch');
+        // 组件使用 role="switch" 和 aria-checked，而不是 aria-pressed
+        expect(button).toHaveAttribute('aria-checked');
       });
     });
 
@@ -46,7 +47,7 @@ describe('ThemeToggle 组件', () => {
       render(ThemeToggle);
 
       await waitFor(() => {
-        const button = screen.getByRole('button');
+        const button = screen.getByRole('switch');
         expect(button).toHaveAttribute('title');
       });
     });
@@ -106,7 +107,7 @@ describe('ThemeToggle 组件', () => {
         expect(document.documentElement.classList.contains('dark')).toBe(false);
       });
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('switch');
       await fireEvent.click(button);
 
       // 应切换到 dark
@@ -122,7 +123,7 @@ describe('ThemeToggle 组件', () => {
         expect(document.documentElement.classList.contains('dark')).toBe(true);
       });
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('switch');
       await fireEvent.click(button);
 
       expect(document.documentElement.classList.contains('dark')).toBe(false);
@@ -137,7 +138,7 @@ describe('ThemeToggle 组件', () => {
         expect(document.documentElement.classList.contains('dark')).toBe(false);
       });
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('switch');
       await fireEvent.click(button);
 
       expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
@@ -148,7 +149,7 @@ describe('ThemeToggle 组件', () => {
 
       render(ThemeToggle);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('switch');
 
       // 切换到 dark
       await fireEvent.click(button);
@@ -174,7 +175,7 @@ describe('ThemeToggle 组件', () => {
       const { container } = render(ThemeToggle);
 
       await waitFor(() => {
-        const button = screen.getByRole('button');
+        const button = screen.getByRole('switch');
         expect(button).toHaveAttribute('aria-label', '切换到亮色模式');
       });
 
@@ -189,7 +190,7 @@ describe('ThemeToggle 组件', () => {
       const { container } = render(ThemeToggle);
 
       await waitFor(() => {
-        const button = screen.getByRole('button');
+        const button = screen.getByRole('switch');
         expect(button).toHaveAttribute('aria-label', '切换到暗色模式');
       });
 
@@ -203,7 +204,7 @@ describe('ThemeToggle 组件', () => {
 
       render(ThemeToggle);
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('switch');
 
       await waitFor(() => {
         expect(button).toHaveAttribute('aria-label', '切换到亮色模式');
@@ -217,26 +218,28 @@ describe('ThemeToggle 组件', () => {
     });
   });
 
-  describe('aria-pressed 属性', () => {
-    it('暗色模式时 aria-pressed 应为 true', async () => {
+  describe('aria-checked 属性', () => {
+    it('暗色模式时 aria-checked 应为 true', async () => {
       localStorage.setItem(THEME_STORAGE_KEY, 'dark');
 
       render(ThemeToggle);
 
       await waitFor(() => {
-        const button = screen.getByRole('button');
-        expect(button).toHaveAttribute('aria-pressed', 'true');
+        const button = screen.getByRole('switch');
+        // 组件使用 role="switch" 和 aria-checked，而不是 aria-pressed
+        expect(button).toHaveAttribute('aria-checked', 'true');
       });
     });
 
-    it('亮色模式时 aria-pressed 应为 false', async () => {
+    it('亮色模式时 aria-checked 应为 false', async () => {
       localStorage.setItem(THEME_STORAGE_KEY, 'light');
 
       render(ThemeToggle);
 
       await waitFor(() => {
-        const button = screen.getByRole('button');
-        expect(button).toHaveAttribute('aria-pressed', 'false');
+        const button = screen.getByRole('switch');
+        // 组件使用 role="switch" 和 aria-checked，而不是 aria-pressed
+        expect(button).toHaveAttribute('aria-checked', 'false');
       });
     });
   });

@@ -152,7 +152,7 @@
   <Header />
 
   <!-- 主内容区域 -->
-  <main class="main-content" id="main-content" role="main" aria-label="主要内容区域">
+  <main class="main-content" id="main-content" aria-label="主要内容区域">
     <!-- 页面标题区域 -->
     <div class="page-header">
       <div class="title-section">
