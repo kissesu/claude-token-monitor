@@ -47,6 +47,8 @@ help:
 	@echo "  make dev          - 启动开发环境（热重载）"
 	@echo "  make dev-backend  - 仅启动后端开发环境"
 	@echo "  make dev-frontend - 仅启动前端开发环境"
+	@echo "  make backend-run  - 启动后端服务（本地）"
+	@echo "  make frontend-run - 启动前端服务（本地）"
 	@echo ""
 	@echo "$(YELLOW)测试$(NC)"
 	@echo "  make test         - 运行所有测试"
@@ -176,6 +178,19 @@ dev-backend: clean-ports
 # ============================================
 dev-frontend: clean-ports
 	@echo "$(GREEN)正在启动前端开发环境...$(NC)"
+	cd frontend && pnpm install && pnpm run dev
+
+# ============================================
+# 快捷命令别名（符合全局规范）
+# ============================================
+# 启动后端服务（不清理端口，适合与 Docker 共存）
+backend-run:
+	@echo "$(GREEN)正在启动后端服务...$(NC)"
+	cd backend && python -m app.main --reload
+
+# 启动前端服务（不清理端口，适合与 Docker 共存）
+frontend-run:
+	@echo "$(GREEN)正在启动前端服务...$(NC)"
 	cd frontend && pnpm install && pnpm run dev
 
 # ============================================
