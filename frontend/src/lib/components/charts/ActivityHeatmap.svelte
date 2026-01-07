@@ -32,12 +32,6 @@
   export let metric: 'sessions' | 'tokens' | 'cost' = 'sessions';
 
   /**
-   * 图表高度（像素）
-   * 默认自动计算
-   */
-  export let height: number = 200;
-
-  /**
    * 是否正在加载
    */
   export let loading: boolean = false;
