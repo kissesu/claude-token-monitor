@@ -28,14 +28,23 @@ import { statsStore } from '$lib/stores/statsStore';
 
 /**
  * WebSocket 服务器 URL
- * 在生产环境可通过环境变量配置
+ * 在开发环境使用相对路径（通过 Vite 代理），在生产环境动态构建
  */
 const getWsUrl = (): string => {
   if (!browser) return 'ws://localhost:51888/ws';
 
   // 使用类型断言来访问 Vite 的环境变量
-  const meta = import.meta as { env?: { VITE_WS_URL?: string } };
-  return meta.env?.VITE_WS_URL || 'ws://localhost:51888/ws';
+  const meta = import.meta as { env?: { VITE_WS_URL?: string; MODE?: string } };
+
+  // 如果明确设置了 WS_URL，使用它
+  if (meta.env?.VITE_WS_URL) {
+    return meta.env.VITE_WS_URL;
+  }
+
+  // 否则根据当前页面协议和主机构建 WebSocket URL
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.host;
+  return `${protocol}//${host}/ws`;
 };
 
 const WS_URL = getWsUrl();

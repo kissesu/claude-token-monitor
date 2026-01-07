@@ -25,14 +25,15 @@ const browser = typeof window !== 'undefined';
 
 /**
  * API 基础 URL
- * 在生产环境可通过环境变量配置
+ * 在开发环境使用空字符串（相对路径），通过 Vite 代理转发
+ * 在生产环境可通过环境变量配置完整 URL
  */
 const getApiBaseUrl = (): string => {
-  if (!browser) return 'http://localhost:51888';
+  if (!browser) return '';
 
   // 使用类型断言来访问 Vite 的环境变量
   const meta = import.meta as { env?: { VITE_API_BASE_URL?: string } };
-  return meta.env?.VITE_API_BASE_URL || 'http://localhost:51888';
+  return meta.env?.VITE_API_BASE_URL || '';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -391,7 +392,7 @@ async function del<T>(endpoint: string, options?: RequestOptions): Promise<ApiRe
  * @returns 当前统计数据缓存
  */
 export async function getCurrentStats(): Promise<StatsCache> {
-  const response = await get<StatsCache>('/stats/current');
+  const response = await get<StatsCache>('/stats');
   return response.data;
 }
 

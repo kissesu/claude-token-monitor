@@ -72,6 +72,24 @@ export default defineConfig(({ mode }) => {
       port: 51173,
       strictPort: true,
       host: true,
+      // ============================================
+      // API 代理配置
+      // 开发环境下将 /api 请求代理到后端服务
+      // ============================================
+      proxy: {
+        '/api': {
+          // 目标后端地址（Docker 环境使用服务名，本地开发使用 localhost）
+          target: process.env.VITE_BACKEND_URL || 'http://localhost:51888',
+          changeOrigin: true,
+          secure: false,
+        },
+        '/ws': {
+          // WebSocket 代理
+          target: process.env.VITE_BACKEND_URL?.replace('http', 'ws') || 'ws://localhost:51888',
+          changeOrigin: true,
+          ws: true,
+        },
+      },
     },
 
     build: {
