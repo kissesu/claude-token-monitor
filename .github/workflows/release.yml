@@ -1,0 +1,201 @@
+/**
+ * @file release.yml
+ * @description GitHub Actions 发布工作流 - 自动版本发布和多平台镜像构建
+ * @author Atlas.oi
+ * @date 2026-01-07
+ *
+ * 安全说明：
+ * - 不直接处理 git commit messages（不受信任的输入）
+ * - 使用环境变量避免命令注入
+ * - Release notes 通过 GitHub UI 手动编辑
+ */
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# ============================================
+# 环境变量配置
+# ============================================
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================
+  # 创建 GitHub Release
+  # ============================================
+  create-release:
+    name: 创建 GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 提取版本信息
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: 创建 Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.version.outputs.VERSION }}
+          RELEASE_VERSION_NUMBER: ${{ steps.version.outputs.VERSION_NUMBER }}
+          RELEASE_REPO: ${{ github.repository }}
+          RELEASE_REGISTRY: ${{ env.REGISTRY }}
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          release_name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Claude Token Monitor ${{ steps.version.outputs.VERSION }}
+
+            ### Docker 镜像
+
+            ```bash
+            # 拉取后端镜像
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}-backend:${{ steps.version.outputs.VERSION_NUMBER }}
+
+            # 拉取前端镜像
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}-frontend:${{ steps.version.outputs.VERSION_NUMBER }}
+
+            # 使用 docker-compose 快速启动
+            curl -o docker-compose.yml https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.version.outputs.VERSION }}/docker-compose.yml
+            docker compose up -d
+            ```
+
+            ### 使用说明
+
+            详细使用说明请参阅 [README.md](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.VERSION }}/README.md)
+
+            ### 变更日志
+
+            请在此处手动添加变更内容，或查看 [完整提交历史](https://github.com/${{ github.repository }}/compare/${{ steps.version.outputs.VERSION }}...main)
+          draft: true
+          prerelease: false
+
+  # ============================================
+  # 构建并推送 Docker 镜像
+  # ============================================
+  build-and-push:
+    name: 构建并推送 Docker 镜像
+    runs-on: ubuntu-latest
+    needs: create-release
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 提取版本信息
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: 设置 QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 登录 GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 提取 Docker 元数据（后端）
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest
+
+      - name: 构建并推送后端镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 提取 Docker 元数据（前端）
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest
+
+      - name: 构建并推送前端镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # 发布成功通知
+  # ============================================
+  release-success:
+    name: 发布成功
+    runs-on: ubuntu-latest
+    needs: [create-release, build-and-push]
+    if: success()
+
+    steps:
+      - name: 提取版本信息
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: 输出成功消息
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.VERSION }}
+          RELEASE_REPO: ${{ github.repository }}
+        run: |
+          echo "✅ 版本 ${RELEASE_VERSION} 发布成功！"
+          echo "- GitHub Release: ✅"
+          echo "- Docker 镜像（linux/amd64）: ✅"
+          echo "- Docker 镜像（linux/arm64）: ✅"
+          echo ""
+          echo "🔗 查看发布: https://github.com/${RELEASE_REPO}/releases/tag/${RELEASE_VERSION}"
