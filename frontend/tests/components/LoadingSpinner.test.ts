@@ -25,7 +25,7 @@ describe('LoadingSpinner', () => {
     it('应该有默认的无障碍文本', () => {
       render(LoadingSpinner);
 
-      expect(screen.getByText('正在加载中,请稍候...')).toBeInTheDocument();
+      expect(screen.getByText('正在加载中，请稍候...')).toBeInTheDocument();
     });
 
     it('应该有正确的 ARIA 属性', () => {
