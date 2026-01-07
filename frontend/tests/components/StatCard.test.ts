@@ -98,7 +98,7 @@ describe('StatCard', () => {
       });
 
       expect(screen.getByText('+10%')).toBeInTheDocument();
-      expect(screen.getByLabelText(/上升/)).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveAttribute('aria-label', '上升 +10%');
     });
 
     it('应该渲染下降趋势', () => {
@@ -198,7 +198,7 @@ describe('StatCard', () => {
     });
 
     it('趋势指示器应该有状态角色', () => {
-      render(StatCard, {
+      const { container } = render(StatCard, {
         props: {
           title: '测试卡片',
           value: 100,
@@ -207,8 +207,9 @@ describe('StatCard', () => {
         },
       });
 
-      const trendElement = screen.getByLabelText(/上升/);
+      const trendElement = container.querySelector('[role="status"]');
       expect(trendElement).toHaveAttribute('role', 'status');
+      expect(trendElement).toHaveAttribute('aria-label', '上升 +10%');
     });
   });
 

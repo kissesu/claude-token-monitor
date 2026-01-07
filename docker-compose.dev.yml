@@ -103,6 +103,8 @@ services:
     environment:
       # Node 环境
       - NODE_ENV=development
+      # Node.js 内存限制（解决构建时内存溢出）
+      - NODE_OPTIONS=--max-old-space-size=4096
       # Vite 配置
       - VITE_API_URL=http://localhost:51888/api/v1
       - VITE_PORT=51173

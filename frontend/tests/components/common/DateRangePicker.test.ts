@@ -146,7 +146,7 @@ describe('DateRangePicker 组件', () => {
       await fireEvent.click(todayButton);
 
       expect(todayButton).toHaveClass('bg-primary-500');
-      expect(todayButton).toHaveAttribute('aria-pressed', 'true');
+      expect(todayButton).toHaveAttribute('aria-checked', 'true');
     });
   });
 
@@ -208,15 +208,15 @@ describe('DateRangePicker 组件', () => {
       // 先点击今日
       const todayButton = screen.getByText('今日');
       await fireEvent.click(todayButton);
-      expect(todayButton).toHaveAttribute('aria-pressed', 'true');
+      expect(todayButton).toHaveAttribute('aria-checked', 'true');
 
       // 手动修改日期
       const startInput = screen.getByLabelText('开始日期');
       await fireEvent.input(startInput, { target: { value: '2026-01-01' } });
 
       // 今日按钮应取消选中，自定义按钮应选中
-      expect(todayButton).toHaveAttribute('aria-pressed', 'false');
-      expect(screen.getByText('自定义')).toHaveAttribute('aria-pressed', 'true');
+      expect(todayButton).toHaveAttribute('aria-checked', 'false');
+      expect(screen.getByText('自定义')).toHaveAttribute('aria-checked', 'true');
     });
   });
 

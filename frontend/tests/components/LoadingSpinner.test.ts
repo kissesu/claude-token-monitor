@@ -111,7 +111,7 @@ describe('LoadingSpinner', () => {
     it('没有文本时应该显示默认的屏幕阅读器文本', () => {
       render(LoadingSpinner);
 
-      const srText = screen.getByText('正在加载中,请稍候...');
+      const srText = screen.getByText('正在加载中，请稍候...');
       expect(srText).toHaveClass('sr-only');
     });
 
@@ -152,7 +152,7 @@ describe('LoadingSpinner', () => {
         props: { text: '加载中' },
       });
 
-      expect(screen.queryByText('正在加载中,请稍候...')).not.toBeInTheDocument();
+      expect(screen.queryByText('正在加载中，请稍候...')).not.toBeInTheDocument();
     });
   });
 

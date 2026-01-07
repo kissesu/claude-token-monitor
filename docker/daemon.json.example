@@ -1,0 +1,15 @@
+{
+  "registry-mirrors": [
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://mirror.ccs.tencentcloud.com",
+    "http://hub-mirror.c.163.com"
+  ],
+  "dns": ["8.8.8.8", "8.8.4.4"],
+  "max-concurrent-downloads": 10,
+  "max-concurrent-uploads": 5,
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
