@@ -110,12 +110,7 @@ export default mergeConfig(
       // ============================================
       // 测试报告配置
       // ============================================
-      reporters: ['default', 'html'],
-
-      // HTML 报告输出目录
-      outputFile: {
-        html: './test-reports/index.html',
-      },
+      reporters: ['default'],
 
       // ============================================
       // 其他配置
