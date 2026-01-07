@@ -42,6 +42,20 @@
   $: formattedValue = isNumeric ? Math.round(displayValue).toLocaleString() : value;
 
   /**
+   * 生成卡片的完整描述文本
+   * 用于屏幕阅读器
+   */
+  $: ariaDescription = (() => {
+    let desc = `${title}: ${formattedValue}`;
+    if (unit) desc += ` ${unit}`;
+    if (trend && trendValue) {
+      const trendText = trend === 'up' ? '上升' : '下降';
+      desc += `, ${trendText} ${trendValue}`;
+    }
+    return desc;
+  })();
+
+  /**
    * 趋势指示器颜色类
    */
   $: trendColorClass =
@@ -82,10 +96,16 @@
 <div
   class="stat-card bg-white dark:bg-surface-800 rounded-lg shadow-md hover:shadow-lg
          transition-all duration-300 p-6 border border-surface-200 dark:border-surface-700"
+  role="article"
+  aria-label="{title}统计卡片"
+  aria-describedby="stat-value-{title}"
 >
   <!-- 卡片头部：标题和图标 -->
   <div class="flex items-center justify-between mb-4">
-    <h3 class="text-sm font-medium text-surface-600 dark:text-surface-400">
+    <h3
+      class="text-sm font-medium text-surface-600 dark:text-surface-400"
+      id="stat-title-{title}"
+    >
       {title}
     </h3>
     {#if icon}
@@ -105,13 +125,19 @@
   </div>
 
   <!-- 数值显示区域 -->
-  <div class="value-container">
+  <div class="value-container" id="stat-value-{title}">
     <div class="flex items-baseline gap-2">
-      <span class="text-3xl font-bold text-surface-900 dark:text-surface-50">
+      <span
+        class="text-3xl font-bold text-surface-900 dark:text-surface-50"
+        aria-label={ariaDescription}
+      >
         {formattedValue}
       </span>
       {#if unit}
-        <span class="text-lg text-surface-600 dark:text-surface-400">
+        <span
+          class="text-lg text-surface-600 dark:text-surface-400"
+          aria-hidden="true"
+        >
           {unit}
         </span>
       {/if}
@@ -119,13 +145,19 @@
 
     <!-- 趋势指示器 -->
     {#if trend && trendValue}
-      <div class="trend-indicator mt-2 flex items-center gap-1 {trendColorClass}">
+      <div
+        class="trend-indicator mt-2 flex items-center gap-1 {trendColorClass}"
+        role="status"
+        aria-label="{trend === 'up' ? '上升' : '下降'} {trendValue}"
+        aria-live="polite"
+      >
         <!-- 趋势箭头图标 -->
         <svg
           class="w-4 h-4"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
           {#if trend === 'up'}
             <!-- 上升箭头 -->

@@ -155,7 +155,12 @@
   图表容器
   使用 Tailwind 类名进行样式控制
 ============================================ -->
-<div class="pie-chart-container {className}" style="height: {height}px;">
+<div
+  class="pie-chart-container {className}"
+  style="height: {height}px;"
+  role="figure"
+  aria-label="{mergedOptions.title}: 展示各模型 Token 使用占比的{(mergedOptions.innerRadius || 0) > 0 ? '环形图' : '饼图'}，共 {chartData.length} 个模型，总计 {totalTokens.toLocaleString()} tokens。"
+>
   <!-- 标题栏 -->
   <div class="flex justify-between items-center mb-4">
     {#if mergedOptions.title}
@@ -169,6 +174,8 @@
       type="button"
       class="px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
       on:click={toggleChartType}
+      aria-pressed={(mergedOptions.innerRadius || 0) > 0}
+      aria-label="切换图表类型：当前为{(mergedOptions.innerRadius || 0) > 0 ? '环形图' : '饼图'}，点击切换"
     >
       {mergedOptions.innerRadius === 0 ? '环形图' : '饼图'}
     </button>
@@ -176,8 +183,9 @@
 
   <!-- 加载状态 -->
   {#if loading}
-    <div class="flex items-center justify-center h-full">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div class="flex items-center justify-center h-full" role="status" aria-busy="true">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true"></div>
+      <span class="sr-only">正在加载模型分布图表...</span>
     </div>
   {:else if chartData.length === 0}
     <!-- 空数据状态 -->
@@ -188,6 +196,8 @@
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
         >
           <path
             stroke-linecap="round"
@@ -282,7 +292,7 @@
           </div>
 
           <!-- 图例列表 -->
-          <div class="legend-list space-y-2">
+          <div class="legend-list space-y-2" role="group" aria-label="模型图例：点击可选中特定模型">
             {#each chartData as item}
               <button
                 type="button"
@@ -291,10 +301,13 @@
                 class:dark:bg-gray-800={selectedModel === item.model}
                 class:opacity-50={selectedModel && selectedModel !== item.model}
                 on:click={() => handleLegendClick(item.model)}
+                aria-pressed={selectedModel === item.model}
+                aria-label="{item.model}：{item.tokens.toLocaleString()} tokens，占比 {item.percentage.toFixed(1)}%。{selectedModel === item.model ? '已选中，点击取消' : '点击选中'}"
               >
                 <span
                   class="legend-color w-4 h-4 rounded-full flex-shrink-0"
                   style="background-color: {item.color};"
+                  aria-hidden="true"
                 ></span>
                 <div class="flex-1 text-left min-w-0">
                   <div class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">

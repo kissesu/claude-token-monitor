@@ -314,7 +314,11 @@
 <!-- ============================================
   热力图容器
 ============================================ -->
-<div class="heatmap-container {className}">
+<div
+  class="heatmap-container {className}"
+  role="figure"
+  aria-label="{title}: 展示{metric === 'sessions' ? '会话数量' : metric === 'tokens' ? 'Token 使用量' : '费用'}的日历热力图，共 {data.length} 天数据。"
+>
   <!-- 标题 -->
   {#if title}
     <div class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
@@ -324,8 +328,9 @@
 
   <!-- 加载状态 -->
   {#if loading}
-    <div class="flex items-center justify-center h-48">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div class="flex items-center justify-center h-48" role="status" aria-busy="true">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true"></div>
+      <span class="sr-only">正在加载活动热力图...</span>
     </div>
   {:else if data.length === 0}
     <!-- 空数据状态 -->
@@ -336,6 +341,8 @@
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
         >
           <path
             stroke-linecap="round"
@@ -395,6 +402,7 @@
                     "
                     role="button"
                     tabindex="0"
+                    aria-label="{cell.date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })}：{cell.value === 0 ? '无数据' : metric === 'sessions' ? `${cell.value} 个会话` : metric === 'tokens' ? `${cell.value.toLocaleString()} tokens` : `$${cell.value.toFixed(4)}`}"
                     on:mouseenter={(e) => handleCellHover(e, cell)}
                     on:mouseleave={handleCellLeave}
                     on:focus={(e) => handleCellHover(e, cell)}
@@ -407,9 +415,9 @@
         </div>
 
         <!-- 图例 -->
-        <div class="legend mt-4 flex items-center justify-end gap-2 text-xs text-gray-600 dark:text-gray-400">
+        <div class="legend mt-4 flex items-center justify-end gap-2 text-xs text-gray-600 dark:text-gray-400" role="group" aria-label="颜色强度图例">
           <span>少</span>
-          <div class="flex gap-1">
+          <div class="flex gap-1" aria-hidden="true">
             {#each colorSchemes[metric] as color}
               <div
                 class="legend-cell rounded-sm"
@@ -431,6 +439,8 @@
         left: {tooltipPosition.x + 10}px;
         top: {tooltipPosition.y + 10}px;
       "
+      role="tooltip"
+      aria-live="polite"
     >
       {formatTooltip(hoveredCell)}
     </div>

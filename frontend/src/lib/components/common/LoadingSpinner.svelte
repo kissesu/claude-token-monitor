@@ -54,14 +54,18 @@
 </script>
 
 <!-- 加载器容器 -->
-<div class="loading-spinner-container flex flex-col items-center justify-center gap-3">
+<div
+  class="loading-spinner-container flex flex-col items-center justify-center gap-3"
+  role="status"
+  aria-busy="true"
+  aria-live="polite"
+>
   <!-- 旋转加载器 -->
   <div
     class="spinner {spinnerSizeClass} border-4 border-surface-200 dark:border-surface-700
            {color ? '' : defaultColorClass} rounded-full animate-spin"
     style={customColorStyle}
-    role="status"
-    aria-label="加载中"
+    aria-hidden="true"
   ></div>
 
   <!-- 加载文本 -->
@@ -69,6 +73,9 @@
     <p class="loading-text {textSizeClass} text-surface-600 dark:text-surface-400 font-medium">
       {text}
     </p>
+  {:else}
+    <!-- 屏幕阅读器可见的加载提示 -->
+    <span class="sr-only">正在加载中，请稍候...</span>
   {/if}
 </div>
 
@@ -103,6 +110,22 @@
 
   .animate-spin {
     animation: spin 1s linear infinite;
+  }
+
+  /**
+   * 屏幕阅读器专用样式
+   * 仅对屏幕阅读器可见
+   */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 
   /**

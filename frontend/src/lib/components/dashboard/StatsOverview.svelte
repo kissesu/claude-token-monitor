@@ -8,7 +8,6 @@
 <script lang="ts">
   import StatCard from '$lib/components/common/StatCard.svelte';
   import { statsStore, totalTokens, totalCost, wsIsConnected } from '$lib/stores';
-  import type { TokenUsage } from '$lib/types';
 
   /**
    * 计算所有模型的输入 Token 总和

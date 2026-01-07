@@ -281,7 +281,12 @@
 <!-- ============================================
   图表容器
 ============================================ -->
-<div class="cost-chart-container {className}" style="height: {height}px;">
+<div
+  class="cost-chart-container {className}"
+  style="height: {height}px;"
+  role="figure"
+  aria-label="{mergedOptions.title}: 展示费用统计数据的{chartType === 'stacked' ? '堆叠柱状图' : '柱状图'}。总计 ${totalCost.toFixed(2)}，日均 ${avgDailyCost.toFixed(4)}。"
+>
   <!-- 标题栏 -->
   <div class="flex justify-between items-start mb-4">
     <div>
@@ -305,7 +310,7 @@
 
     <!-- 图表类型切换 -->
     {#if modelCostData.length > 0}
-      <div class="flex gap-2">
+      <div class="flex gap-2" role="group" aria-label="图表类型选择">
         <button
           type="button"
           class="px-3 py-1 text-xs font-medium rounded-md transition-colors"
@@ -316,6 +321,7 @@
           class:text-gray-700={chartType !== 'bar'}
           class:dark:text-gray-300={chartType !== 'bar'}
           on:click={() => (chartType = 'bar')}
+          aria-pressed={chartType === 'bar'}
         >
           总费用
         </button>
@@ -329,6 +335,7 @@
           class:text-gray-700={chartType !== 'stacked'}
           class:dark:text-gray-300={chartType !== 'stacked'}
           on:click={() => (chartType = 'stacked')}
+          aria-pressed={chartType === 'stacked'}
         >
           按模型
         </button>
@@ -338,8 +345,9 @@
 
   <!-- 加载状态 -->
   {#if loading}
-    <div class="flex items-center justify-center h-full">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div class="flex items-center justify-center h-full" role="status" aria-busy="true">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true"></div>
+      <span class="sr-only">正在加载费用图表...</span>
     </div>
   {:else if data.length === 0}
     <!-- 空数据状态 -->
@@ -350,6 +358,8 @@
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
         >
           <path
             stroke-linecap="round"
@@ -519,17 +529,20 @@
 
     <!-- 图例（堆叠图模式） -->
     {#if chartType === 'stacked' && mergedOptions.showLegend && uniqueModels.length > 0}
-      <div class="legend-container flex flex-wrap gap-3 mt-4 justify-center">
+      <div class="legend-container flex flex-wrap gap-3 mt-4 justify-center" role="group" aria-label="图例：点击可切换模型显示">
         {#each uniqueModels as model}
           <button
             type="button"
             class="legend-item flex items-center gap-2 px-3 py-1 rounded-md transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             class:opacity-40={hiddenModels.has(model)}
             on:click={() => toggleModel(model)}
+            aria-pressed={!hiddenModels.has(model)}
+            aria-label="{model}：{hiddenModels.has(model) ? '已隐藏，点击显示' : '点击隐藏'}"
           >
             <span
               class="legend-color w-4 h-4 rounded-full"
               style="background-color: {getModelColor(model)};"
+              aria-hidden="true"
             ></span>
             <span class="legend-label text-sm text-gray-700 dark:text-gray-300">
               {model}

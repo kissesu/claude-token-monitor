@@ -38,7 +38,10 @@
 </script>
 
 <!-- 页面底部容器 -->
-<footer class="footer bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 mt-auto">
+<footer
+  class="footer bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 mt-auto"
+  role="contentinfo"
+>
   <div class="container mx-auto px-4 py-6">
     <!-- 底部内容网格布局 -->
     <div class="footer-content grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
@@ -50,6 +53,8 @@
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
           >
             <path
               fill-rule="evenodd"
@@ -84,6 +89,8 @@
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
           >
             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
           </svg>

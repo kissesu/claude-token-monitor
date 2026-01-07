@@ -184,3 +184,96 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: var(--color-surface-500);
 }
+
+/* ============================================
+ * 无障碍（Accessibility）样式
+ * ============================================ */
+
+/**
+ * 屏幕阅读器专用内容
+ * 在视觉上隐藏元素，但屏幕阅读器仍可访问
+ * 用于为屏幕阅读器提供额外的上下文信息
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/**
+ * 焦点可见样式
+ * 为键盘导航提供清晰的焦点指示器
+ * 符合 WCAG 2.1 AA 级标准的对比度要求
+ */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/**
+ * 仅在键盘导航时显示焦点样式
+ * 鼠标点击时不显示焦点环
+ */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/**
+ * 按钮和交互元素的焦点样式
+ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/**
+ * 暗色主题下的焦点样式调整
+ * 使用更亮的颜色确保可见性
+ */
+.dark :focus-visible {
+  outline-color: #60a5fa; /* 更亮的蓝色，确保在深色背景上可见 */
+}
+
+/**
+ * 减少动画偏好支持
+ * 尊重用户的系统级动画偏好设置
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * 高对比度模式支持
+ * 为使用高对比度模式的用户提供更好的可见性
+ */
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline-width: 3px;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    border: 1px solid currentColor;
+  }
+}

@@ -160,7 +160,12 @@
   图表容器
   使用 Tailwind 类名进行样式控制
 ============================================ -->
-<div class="trend-chart-container {className}" style="height: {height}px;">
+<div
+  class="trend-chart-container {className}"
+  style="height: {height}px;"
+  role="figure"
+  aria-label="{mergedOptions.title}: 展示 Token 使用趋势的折线图，包含 {seriesData.length} 个数据系列。"
+>
   <!-- 标题 -->
   {#if mergedOptions.title}
     <div class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
@@ -170,8 +175,9 @@
 
   <!-- 加载状态 -->
   {#if loading}
-    <div class="flex items-center justify-center h-full">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <div class="flex items-center justify-center h-full" role="status" aria-busy="true">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true"></div>
+      <span class="sr-only">正在加载趋势图表...</span>
     </div>
   {:else if chartData.length === 0}
     <!-- 空数据状态 -->
@@ -182,6 +188,8 @@
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
         >
           <path
             stroke-linecap="round"
@@ -275,17 +283,20 @@
 
     <!-- 图例 -->
     {#if mergedOptions.showLegend && seriesData.length > 0}
-      <div class="legend-container flex flex-wrap gap-4 mt-4 justify-center">
+      <div class="legend-container flex flex-wrap gap-4 mt-4 justify-center" role="group" aria-label="图例：点击可切换数据系列显示">
         {#each seriesData as series, index}
           <button
             type="button"
             class="legend-item flex items-center gap-2 px-3 py-1 rounded-md transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             class:opacity-40={!series.visible}
             on:click={() => toggleSeries(index)}
+            aria-pressed={series.visible}
+            aria-label="{series.name}：{series.visible ? '点击隐藏' : '已隐藏，点击显示'}"
           >
             <span
               class="legend-color w-4 h-4 rounded-full"
               style="background-color: {series.color};"
+              aria-hidden="true"
             ></span>
             <span class="legend-label text-sm text-gray-700 dark:text-gray-300">
               {series.name}

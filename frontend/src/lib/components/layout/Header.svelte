@@ -7,6 +7,7 @@
 
 <script lang="ts">
   import ThemeToggle from './ThemeToggle.svelte';
+  import { onMount } from 'svelte';
 
   /**
    * 移动端菜单展开状态
@@ -14,26 +15,66 @@
   let isMobileMenuOpen = false;
 
   /**
+   * 菜单按钮引用
+   */
+  let menuButtonRef: HTMLButtonElement;
+
+  /**
    * 切换移动端菜单
    */
   function toggleMobileMenu() {
     isMobileMenuOpen = !isMobileMenuOpen;
   }
+
+  /**
+   * 关闭移动端菜单
+   */
+  function closeMobileMenu() {
+    if (isMobileMenuOpen) {
+      isMobileMenuOpen = false;
+      // 焦点返回到菜单按钮
+      menuButtonRef?.focus();
+    }
+  }
+
+  /**
+   * 处理键盘事件
+   * 支持 Escape 键关闭菜单
+   */
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      closeMobileMenu();
+    }
+  }
+
+  /**
+   * 组件挂载时添加键盘监听
+   */
+  onMount(() => {
+    document.addEventListener('keydown', handleKeydown);
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+    };
+  });
 </script>
 
 <!-- 页面头部容器 -->
-<header class="header bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 shadow-sm">
+<header
+  class="header bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 shadow-sm"
+  role="banner"
+>
   <div class="container mx-auto px-4">
     <div class="flex items-center justify-between h-16">
       <!-- Logo 和标题 -->
       <div class="flex items-center gap-3">
         <!-- Logo 图标 -->
-        <div class="logo-icon">
+        <div class="logo-icon" aria-hidden="true">
           <svg
             class="w-8 h-8 text-primary-500"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            focusable="false"
           >
             <path
               fill-rule="evenodd"
@@ -52,7 +93,11 @@
       <!-- 桌面端操作区 -->
       <div class="hidden md:flex items-center gap-4">
         <!-- 导航链接（预留，可根据需要添加） -->
-        <nav class="flex items-center gap-4">
+        <nav
+          class="flex items-center gap-4"
+          role="navigation"
+          aria-label="主导航"
+        >
           <!-- 未来可以在这里添加导航链接 -->
         </nav>
 
@@ -63,6 +108,7 @@
       <!-- 移动端菜单按钮 -->
       <div class="md:hidden">
         <button
+          bind:this={menuButtonRef}
           type="button"
           on:click={toggleMobileMenu}
           class="mobile-menu-button p-2 rounded-lg transition-colors
@@ -71,6 +117,8 @@
                  focus:outline-none focus:ring-2 focus:ring-primary-500"
           aria-label={isMobileMenuOpen ? '关闭菜单' : '打开菜单'}
           aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-menu"
+          aria-haspopup="true"
         >
           {#if isMobileMenuOpen}
             <!-- 关闭图标 -->
@@ -80,6 +128,8 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
             >
               <path
                 stroke-linecap="round"
@@ -96,6 +146,8 @@
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
             >
               <path
                 stroke-linecap="round"
@@ -111,9 +163,18 @@
 
     <!-- 移动端菜单面板 -->
     {#if isMobileMenuOpen}
-      <div class="mobile-menu md:hidden py-4 border-t border-surface-200 dark:border-surface-700">
+      <div
+        class="mobile-menu md:hidden py-4 border-t border-surface-200 dark:border-surface-700"
+        id="mobile-menu"
+        role="region"
+        aria-label="移动端菜单"
+      >
         <!-- 导航链接（预留） -->
-        <nav class="flex flex-col gap-2 mb-4">
+        <nav
+          class="flex flex-col gap-2 mb-4"
+          role="navigation"
+          aria-label="移动端导航"
+        >
           <!-- 未来可以在这里添加移动端导航链接 -->
         </nav>
 

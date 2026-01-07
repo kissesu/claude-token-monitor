@@ -62,6 +62,13 @@
   $: config = typeConfig[type];
 
   /**
+   * 获取 ARIA role 和 live 属性
+   * error 类型使用 alert role，其他类型使用 status
+   */
+  $: ariaRole = type === 'error' ? 'alert' : 'status';
+  $: ariaLive = type === 'error' ? 'assertive' : 'polite';
+
+  /**
    * 处理重试按钮点击
    */
   function handleRetry() {
@@ -91,8 +98,9 @@
   <div
     class="error-message {config.bgClass} border rounded-lg p-4 shadow-md
            transition-all duration-300 ease-in-out"
-    role="alert"
-    aria-live="polite"
+    role={ariaRole}
+    aria-live={ariaLive}
+    aria-atomic="true"
   >
     <div class="flex items-start gap-3">
       <!-- 图标 -->

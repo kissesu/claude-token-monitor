@@ -26,7 +26,6 @@ from ..core.schemas import (
     DailyActivity,
 )
 from ..core.stats_reader import StatsReader
-from ..core.data_processor import DataProcessor
 from ..db.database import get_database, Database
 from ..core.export_service import ExportService
 
@@ -51,16 +50,6 @@ async def get_stats_reader() -> StatsReader:
         StatsReader: 统计数据读取器
     """
     return StatsReader()
-
-
-async def get_data_processor() -> DataProcessor:
-    """
-    获取数据处理器实例
-
-    Returns:
-        DataProcessor: 数据处理器
-    """
-    return DataProcessor()
 
 
 async def get_export_service() -> ExportService:
@@ -272,7 +261,6 @@ async def get_model_stats(
 async def get_trends(
     days: int = Query(30, ge=1, le=365, description="统计天数，范围 1-365"),
     reader: StatsReader = Depends(get_stats_reader),
-    processor: DataProcessor = Depends(get_data_processor),
 ):
     """
     获取趋势数据

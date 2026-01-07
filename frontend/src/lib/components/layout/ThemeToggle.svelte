@@ -64,6 +64,35 @@
     const newTheme: Theme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
     saveTheme(newTheme);
+
+    // 通知屏幕阅读器主题已变更
+    announceThemeChange(newTheme);
+  }
+
+  /**
+   * 通知屏幕阅读器主题已变更
+   */
+  function announceThemeChange(theme: Theme) {
+    const announcement = theme === 'dark' ? '已切换到暗色模式' : '已切换到亮色模式';
+    const liveRegion = document.getElementById('theme-change-announcement');
+    if (liveRegion) {
+      liveRegion.textContent = announcement;
+      // 清除消息,避免重复朗读
+      setTimeout(() => {
+        liveRegion.textContent = '';
+      }, 1000);
+    }
+  }
+
+  /**
+   * 处理键盘事件
+   * 支持 Enter 和 Space 键触发切换
+   */
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleTheme();
+    }
   }
 
   /**
@@ -97,6 +126,7 @@
 <button
   type="button"
   on:click={toggleTheme}
+  on:keydown={handleKeydown}
   class="theme-toggle p-2 rounded-lg transition-all duration-200
          bg-surface-100 dark:bg-surface-700
          hover:bg-surface-200 dark:hover:bg-surface-600
@@ -104,7 +134,10 @@
          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
          dark:focus:ring-offset-surface-800"
   aria-label={currentTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
+  aria-pressed={currentTheme === 'dark'}
   title={currentTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
+  role="switch"
+  aria-checked={currentTheme === 'dark'}
 >
   <!-- 太阳图标（亮色模式） -->
   {#if currentTheme === 'dark'}
@@ -113,6 +146,8 @@
       fill="currentColor"
       viewBox="0 0 20 20"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
     >
       <path
         fill-rule="evenodd"
@@ -127,11 +162,22 @@
       fill="currentColor"
       viewBox="0 0 20 20"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
     >
       <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
     </svg>
   {/if}
 </button>
+
+<!-- 屏幕阅读器专用通知区域 -->
+<div
+  id="theme-change-announcement"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+  class="sr-only"
+></div>
 
 <style>
   /**

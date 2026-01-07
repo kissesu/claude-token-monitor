@@ -154,13 +154,20 @@
 </script>
 
 <!-- 日期范围选择器容器 -->
-<div class="date-range-picker bg-white dark:bg-surface-800 rounded-lg p-4 border border-surface-200 dark:border-surface-700">
+<div
+  class="date-range-picker bg-white dark:bg-surface-800 rounded-lg p-4 border border-surface-200 dark:border-surface-700"
+  role="group"
+  aria-labelledby="date-range-picker-title"
+>
   <!-- 快捷选项按钮组 -->
-  <div class="preset-buttons mb-4">
-    <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+  <div class="preset-buttons mb-4" role="group" aria-label="快捷日期选择">
+    <label
+      id="date-range-picker-title"
+      class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
+    >
       快捷选择
     </label>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="日期范围预设选项">
       {#each presets as preset}
         <button
           type="button"
@@ -169,6 +176,10 @@
                    ? 'bg-primary-500 text-white'
                    : 'bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600'}"
           on:click={() => handlePresetClick(preset.value)}
+          role="radio"
+          tabindex={selectedPreset === preset.value ? 0 : -1}
+          aria-checked={selectedPreset === preset.value}
+          aria-label="选择{preset.label}"
         >
           {preset.label}
         </button>
@@ -195,7 +206,9 @@
                rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500
                focus:border-primary-500 bg-white dark:bg-surface-700
                text-surface-900 dark:text-surface-100 transition-colors"
-        aria-label="选择开始日期"
+        aria-describedby={!isValidRange && localStartDate && localEndDate ? 'date-range-error' : undefined}
+        aria-invalid={!isValidRange && localStartDate && localEndDate}
+        aria-required="false"
       />
     </div>
 
@@ -216,14 +229,21 @@
                rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500
                focus:border-primary-500 bg-white dark:bg-surface-700
                text-surface-900 dark:text-surface-100 transition-colors"
-        aria-label="选择结束日期"
+        aria-describedby={!isValidRange && localStartDate && localEndDate ? 'date-range-error' : undefined}
+        aria-invalid={!isValidRange && localStartDate && localEndDate}
+        aria-required="false"
       />
     </div>
   </div>
 
   <!-- 日期范围验证提示 -->
   {#if localStartDate && localEndDate && !isValidRange}
-    <div class="validation-message mt-3 text-sm text-red-600 dark:text-red-400">
+    <div
+      id="date-range-error"
+      class="validation-message mt-3 text-sm text-red-600 dark:text-red-400"
+      role="alert"
+      aria-live="polite"
+    >
       <svg
         class="inline-block w-4 h-4 mr-1"
         fill="currentColor"

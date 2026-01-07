@@ -1,19 +1,124 @@
-/**
- * @file index.html
- * @description 前端应用入口 HTML
- * @author Atlas.oi
- * @date 2026-01-07
- */
 <!DOCTYPE html>
+<!--
+  @file index.html
+  @description 前端应用入口 HTML，包含性能优化配置
+  @author Atlas.oi
+  @date 2026-01-07
+-->
 <html lang="zh-CN">
   <head>
+    <!-- ============================================
+      基础 Meta 标签
+    ============================================ -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Claude Token Monitor - 监控和分析 Claude API Token 使用情况" />
+
+    <!-- ============================================
+      SEO 优化 Meta 标签
+    ============================================ -->
+    <meta name="description" content="Claude Token Monitor - 实时监控和分析 Claude API Token 使用情况的本地仪表板工具" />
+    <meta name="keywords" content="Claude, Token, Monitor, API, 监控, 仪表板, 统计" />
+    <meta name="author" content="Atlas.oi" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- ============================================
+      性能优化 Meta 标签
+    ============================================ -->
+    <!-- DNS 预解析，加速后端 API 连接 -->
+    <link rel="dns-prefetch" href="//localhost" />
+
+    <!-- 预连接到可能的资源域 -->
+    <link rel="preconnect" href="//localhost" crossorigin />
+
+    <!-- 预加载关键资源 -->
+    <link rel="modulepreload" href="/src/main.ts" />
+
+    <!-- 预获取可能需要的资源（低优先级） -->
+    <link rel="prefetch" as="script" href="/src/lib/components/dashboard/ModelUsagePanel.svelte" />
+    <link rel="prefetch" as="script" href="/src/lib/components/dashboard/DailyActivityPanel.svelte" />
+
+    <!-- 主题色配置 -->
+    <meta name="theme-color" content="#3b82f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: dark)" />
+
+    <!-- 兼容性配置 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- 移动端优化 -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Token Monitor" />
+
+    <!-- ============================================
+      性能提示 - Resource Hints
+      指导浏览器如何加载资源
+    ============================================ -->
+    <!-- 重要：Vite 会在构建时自动注入 modulepreload -->
+
+    <!-- ============================================
+      Favicon 配置
+    ============================================ -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+
+    <!-- ============================================
+      Open Graph 标签 (社交分享)
+    ============================================ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Claude Token Monitor" />
+    <meta property="og:description" content="实时监控 Claude API Token 使用情况" />
+    <meta property="og:locale" content="zh_CN" />
+
     <title>Claude Token Monitor</title>
+
+    <!-- ============================================
+      关键 CSS 内联 (Critical CSS)
+      减少首屏渲染阻塞
+    ============================================ -->
+    <style>
+      /* 基础样式内联，避免 FOUC (无样式内容闪烁) */
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+      body{min-height:100vh;background-color:#fafafa}
+      /* 暗色模式支持 */
+      @media(prefers-color-scheme:dark){body{background-color:#171717;color:#fafafa}}
+      /* 加载状态样式 */
+      #app{min-height:100vh;display:flex;align-items:center;justify-content:center}
+      .loading-placeholder{text-align:center;color:#737373}
+      .loading-spinner{width:40px;height:40px;border:3px solid #e5e5e5;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
+      @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <!-- ============================================
+      应用挂载点
+      初始显示加载占位符，避免白屏
+    ============================================ -->
+    <div id="app">
+      <div class="loading-placeholder">
+        <div class="loading-spinner"></div>
+        <p>正在加载应用...</p>
+      </div>
+    </div>
+
+    <!-- ============================================
+      主应用脚本
+      使用 type="module" 启用 ES 模块
+    ============================================ -->
     <script type="module" src="/src/main.ts"></script>
+
+    <!-- ============================================
+      No JavaScript 回退
+    ============================================ -->
+    <noscript>
+      <style>
+        .loading-placeholder { display: none; }
+      </style>
+      <div style="text-align:center;padding:2rem;">
+        <h1>Claude Token Monitor</h1>
+        <p>此应用需要启用 JavaScript 才能运行。</p>
+        <p>请在浏览器设置中启用 JavaScript。</p>
+      </div>
+    </noscript>
   </body>
 </html>

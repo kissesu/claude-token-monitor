@@ -26,6 +26,13 @@ dist-ssr
 # 测试
 coverage
 *.log
+test-results/
+playwright-report/
+playwright/.cache/
+
+# 性能测试报告
+lighthouse-report.*
+stats.html
 
 # 系统文件
 Thumbs.db
