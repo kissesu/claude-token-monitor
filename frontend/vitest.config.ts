@@ -48,6 +48,8 @@ export default mergeConfig(
         '**/node_modules/**',
         '**/dist/**',
         '**/.svelte-kit/**',
+        // 排除 E2E 测试（使用 Playwright 运行）
+        'tests/e2e/**',
       ],
 
       // ============================================
