@@ -1,15 +1,13 @@
-/**
- * @file Dockerfile.dev
- * @description Claude Token Monitor 开发环境 Dockerfile
- * @author Atlas.oi
- * @date 2026-01-07
- *
- * 开发环境特性：
- * - 支持代码热重载
- * - 挂载本地源码目录
- * - 包含开发工具和调试依赖
- * - 分离前后端服务便于独立调试
- */
+# Dockerfile.dev
+# Claude Token Monitor 开发环境 Dockerfile
+# @author Atlas.oi
+# @date 2026-01-07
+#
+# 开发环境特性：
+# - 支持代码热重载
+# - 挂载本地源码目录
+# - 包含开发工具和调试依赖
+# - 分离前后端服务便于独立调试
 
 FROM python:3.11-alpine
 

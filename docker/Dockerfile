@@ -1,9 +1,7 @@
-/**
- * @file Dockerfile
- * @description Claude Token Monitor 生产环境多阶段构建文件
- * @author Atlas.oi
- * @date 2026-01-07
- */
+# Dockerfile
+# Claude Token Monitor 生产环境多阶段构建文件
+# @author Atlas.oi
+# @date 2026-01-07
 
 # ============================================
 # 第一阶段：前端构建
