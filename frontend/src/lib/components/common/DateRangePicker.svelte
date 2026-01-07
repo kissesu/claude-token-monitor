@@ -294,7 +294,7 @@
     filter: invert(0.5);
   }
 
-  .dark input[type='date']::-webkit-calendar-picker-indicator {
+  :global(.dark) input[type='date']::-webkit-calendar-picker-indicator {
     filter: invert(0.8);
   }
 

@@ -190,13 +190,14 @@
 <style>
   /**
    * 头部固定定位样式
+   * 注意：使用 :global() 包裹以支持 Tailwind 动态添加的 .dark 类
    */
-  .header {
+  :global(.header) {
     backdrop-filter: blur(8px);
     background-color: rgba(255, 255, 255, 0.95);
   }
 
-  .dark .header {
+  :global(.dark .header) {
     background-color: rgba(38, 38, 38, 0.95);
   }
 
@@ -251,26 +252,5 @@
     }
   }
 
-  /**
-   * 导航链接样式（预留）
-   */
-  nav a {
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    transition: all 0.2s;
-    font-weight: 500;
-    color: var(--color-surface-700);
-  }
 
-  .dark nav a {
-    color: var(--color-surface-300);
-  }
-
-  nav a:hover {
-    background-color: var(--color-surface-100);
-  }
-
-  .dark nav a:hover {
-    background-color: var(--color-surface-700);
-  }
 </style>
