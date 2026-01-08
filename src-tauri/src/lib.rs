@@ -7,6 +7,10 @@
 
 use tauri::Manager;
 
+pub mod db;
+pub mod models;
+pub mod services;
+
 /// 示例 Tauri 命令：返回问候语
 /// 后续阶段会替换为真实的数据命令
 #[tauri::command]
