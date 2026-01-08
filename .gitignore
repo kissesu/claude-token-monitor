@@ -64,6 +64,10 @@ logs/
 *.swo
 *~
 .DS_Store
+.playwright-mcp/
+.serena/
+docs/
+~/
 
 # 测试覆盖率
 .coverage
