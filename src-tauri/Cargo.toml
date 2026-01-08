@@ -1,0 +1,52 @@
+[package]
+name = "claude-token-monitor"
+version = "1.0.0"
+description = "Claude Token Monitor - Tauri Desktop Application"
+authors = ["Atlas.oi"]
+license = "MIT"
+repository = ""
+edition = "2021"
+
+[lib]
+name = "claude_token_monitor_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Tauri 核心
+tauri = { version = "2", features = ["devtools"] }
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-autostart = "2"
+
+# 序列化
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# 异步运行时
+tokio = { version = "1", features = ["full"] }
+
+# 数据库
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# 文件监控
+notify = "6"
+
+# 时间处理
+chrono = "0.4"
+
+# API Key 哈希
+sha2 = "0.10"
+
+# 跨平台用户目录
+dirs = "5"
+
+# 错误处理
+thiserror = "1"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

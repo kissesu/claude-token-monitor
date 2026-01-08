@@ -76,3 +76,10 @@ htmlcov/
 *.bak
 *.cache
 .temp/
+
+# Legacy Archive（旧架构归档，仅供参考）
+legacy_archive/
+
+# Tauri
+src-tauri/target/
+src-tauri/Cargo.lock

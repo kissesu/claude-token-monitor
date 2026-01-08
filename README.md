@@ -1,168 +1,155 @@
 # Claude Token Monitor
 
-基于 Claude CLI 的 Token 使用量监控与可视化系统
+Tauri 2.x 桌面端 Claude CLI Token 使用量监控与可视化应用
 
 ## 项目简介
 
-Claude Token Monitor 是一个实时监控和可视化 Claude CLI Token 使用情况的工具。通过解析 `~/.claude/usage.json` 文件，自动记录每次对话的 Token 消耗，并提供直观的图表展示和数据分析功能。
+Claude Token Monitor 是一个轻量级桌面应用，实时监控和可视化 Claude CLI 的 Token 使用情况。通过监控 `~/.claude/` 目录下的文件变化，自动记录每次对话的 Token 消耗，并提供直观的图表展示和数据分析功能。
 
 ## 核心功能
 
 - **实时监控**：自动监控 Claude CLI 的 Token 使用情况
+- **多供应商区分**：按 API Key 区分不同中转站的 Token 使用统计
+- **今日优先**：优先显示当天各供应商的 Token 消耗和缓存命中率
 - **历史记录**：完整记录每次对话的详细 Token 消耗
 - **可视化展示**：提供多维度的图表展示和数据分析
 - **趋势分析**：展示 Token 使用趋势和统计信息
-- **导出功能**：支持数据导出为 CSV 或 JSON 格式
+- **桌面端体验**：原生桌面应用，启动快、体积小
 
 ## 技术栈
 
-### 后端
-- **Python 3.11+**：核心开发语言
-- **FastAPI**：高性能 Web 框架
-- **SQLite**：轻量级数据库
-- **SQLAlchemy**：ORM 框架
-- **Pydantic**：数据验证
-
-### 前端
-- **SvelteKit**：现代化前端框架
-- **TypeScript**：类型安全
-- **Tailwind CSS**：样式框架
-- **Chart.js**：图表可视化
+| 模块 | 技术 | 说明 |
+|------|------|------|
+| 桌面框架 | Tauri 2.x | 轻量级跨平台桌面框架 |
+| 后端 | Rust | 高性能、内存安全 |
+| 前端 | React 18 + TypeScript | 现代化前端框架 |
+| 样式 | TailwindCSS 3.4 | 原子化 CSS |
+| 状态管理 | Zustand | 轻量级状态管理 |
+| 图表 | Recharts | React 原生图表库 |
+| 数据库 | SQLite | 轻量级本地数据库 |
 
 ## 项目结构
 
 ```
 claude-token-monitor/
-├── backend/                # 后端服务
-│   ├── app/
-│   │   ├── core/          # 核心模块（配置、日志等）
-│   │   ├── api/           # API 路由
-│   │   ├── db/            # 数据库模型和操作
-│   │   └── main.py        # 应用入口
-│   └── tests/             # 后端测试
-├── frontend/              # 前端应用
-│   ├── src/
-│   │   ├── lib/
-│   │   │   ├── components/ # Svelte 组件
-│   │   │   ├── stores/     # 状态管理
-│   │   │   ├── services/   # API 服务
-│   │   │   └── types/      # TypeScript 类型
-│   │   └── routes/         # 页面路由
-│   └── tests/             # 前端测试
-├── docker/                # Docker 配置
-├── data/                  # 数据库文件（gitignore）
-├── scripts/               # 工具脚本
-├── .env.example           # 环境变量模板
-└── README.md
+├── src-tauri/                  # Tauri Rust 后端
+│   ├── Cargo.toml              # Rust 依赖配置
+│   ├── tauri.conf.json         # Tauri 配置
+│   └── src/
+│       ├── main.rs             # 应用入口
+│       ├── commands/           # Tauri Commands (IPC)
+│       ├── services/           # 核心服务（文件监控、解析等）
+│       ├── db/                 # 数据库层
+│       └── models/             # 数据模型
+│
+├── src/                        # React 前端
+│   ├── main.tsx                # React 入口
+│   ├── App.tsx                 # 主应用组件
+│   ├── types/                  # TypeScript 类型
+│   ├── stores/                 # Zustand 状态管理
+│   ├── hooks/                  # React Hooks
+│   └── components/             # React 组件
+│       ├── layout/             # 布局组件
+│       ├── common/             # 通用组件
+│       ├── charts/             # 图表组件
+│       ├── dashboard/          # 仪表板面板
+│       └── provider/           # 供应商相关组件
+│
+├── docs/                       # 项目文档
+│   └── tauri-desktop-plan.md   # 完整项目方案
+│
+├── index.html                  # HTML 入口
+├── vite.config.ts              # Vite 配置
+├── tailwind.config.js          # TailwindCSS 配置
+├── tsconfig.json               # TypeScript 配置
+└── package.json                # 前端依赖
 ```
 
 ## 快速开始
 
 ### 环境要求
 
-- Python 3.11+
+- Rust 1.75+
 - Node.js 18+
 - pnpm 8+
-- Claude CLI（已配置）
+- 系统 WebView（macOS 自带，Windows 需要 WebView2）
 
-### 安装步骤
-
-1. **克隆项目**
-   ```bash
-   git clone <repository-url>
-   cd claude-token-monitor
-   ```
-
-2. **配置环境变量**
-   ```bash
-   cp .env.example .env
-   # 根据实际情况修改 .env 文件
-   ```
-
-3. **启动后端服务**
-   ```bash
-   make backend-run
-   ```
-
-4. **启动前端服务**
-   ```bash
-   make frontend-run
-   ```
-
-5. **访问应用**
-   - 前端地址：http://localhost:51173
-   - 后端 API：http://localhost:51888
-
-## 开发指南
-
-### 后端开发
+### 开发环境
 
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 51888
-```
+# 克隆项目
+git clone <repository-url>
+cd claude-token-monitor
 
-### 前端开发
-
-```bash
-cd frontend
+# 安装前端依赖
 pnpm install
-pnpm dev --port 51173
+
+# 启动开发模式
+pnpm tauri dev
 ```
 
-### 运行测试
+### 构建发布
 
 ```bash
-# 后端测试
-cd backend
-pytest
-
-# 前端测试
-cd frontend
-pnpm test
+# 构建桌面应用
+pnpm tauri build
 ```
 
-## 配置说明
+构建产物位于 `src-tauri/target/release/bundle/`：
+- macOS: `.dmg` / `.app`
+- Windows: `.msi` / `.exe`
+- Linux: `.AppImage` / `.deb`
 
-主要配置项（`.env` 文件）：
+## 架构特点
 
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| CLAUDE_DIR | Claude CLI 配置目录 | ~/.claude |
-| DATABASE_PATH | 数据库文件路径 | data/monitor.db |
-| BACKEND_PORT | 后端服务端口 | 51888 |
-| FRONTEND_PORT | 前端服务端口 | 51173 |
-| LOG_LEVEL | 日志级别 | INFO |
-| DEBUG | 调试模式 | false |
+### Tauri IPC 通信
 
-## 数据结构
-
-### usage.json 示例
-
-```json
-{
-  "usage": {
-    "input_tokens": 1234,
-    "output_tokens": 567,
-    "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 0
-  },
-  "timestamp": "2026-01-07T10:30:00Z"
-}
+```
+┌─────────────────────────────────────────────────┐
+│              React Frontend (WebView)            │
+│  ┌───────────┐  ┌───────────┐  ┌─────────────┐  │
+│  │  Zustand  │  │   Hooks   │  │ Components  │  │
+│  │  Stores   │  │ useTauri  │  │             │  │
+│  └─────┬─────┘  └─────┬─────┘  └─────────────┘  │
+│        │              │                          │
+└────────┼──────────────┼──────────────────────────┘
+         │   invoke()   │   listen()
+         ▼              ▼
+┌────────────────────────────────────────────────┐
+│              Tauri Core (Rust)                  │
+│  ┌────────────┐  ┌────────────┐  ┌──────────┐  │
+│  │  Commands  │  │   Events   │  │ Services │  │
+│  │  Handler   │  │  Emitter   │  │          │  │
+│  └────────────┘  └────────────┘  └──────────┘  │
+└────────────────────────────────────────────────┘
 ```
 
-## 贡献指南
+### 数据流
 
-欢迎贡献代码、报告问题或提出建议！
+1. **文件监控**: Rust 使用 `notify` crate 监控 `~/.claude/` 目录
+2. **数据解析**: 解析 settings.json（供应商）和 *.jsonl（Token 使用）
+3. **数据存储**: SQLite 本地数据库持久化
+4. **事件推送**: 通过 Tauri Events 推送到前端
+5. **UI 更新**: React 响应式更新界面
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'feat: 添加某个特性'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+## 文档
+
+- [完整项目方案](docs/tauri-desktop-plan.md) - 详细的技术设计和实施计划
+
+## 开发状态
+
+> **当前阶段**: 架构重构规划中
+
+### 里程碑
+
+- [ ] Phase 0: 项目初始化 - Tauri 2.x 项目骨架
+- [ ] Phase 1: Rust 后端核心 - 文件监控、解析、数据库
+- [ ] Phase 2: IPC 通信层 - Commands + Events
+- [ ] Phase 3: React 基础架构 - 类型、Store、布局
+- [ ] Phase 4: 核心数据展示 - StatCard、表格、实时更新
+- [ ] Phase 5: 供应商功能 - 多供应商区分统计
+- [ ] Phase 6: 图表可视化 - 趋势图、饼图、热力图
+- [ ] Phase 7: 测试与打包 - 跨平台构建
 
 ## 许可证
 
@@ -171,12 +158,6 @@ MIT License
 ## 作者
 
 Atlas.oi
-
-## 更新日志
-
-### 2026-01-07
-- 初始化项目结构
-- 完成 Phase 0 基础框架搭建
 
 ---
 
