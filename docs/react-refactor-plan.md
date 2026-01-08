@@ -34,6 +34,7 @@
 3. **类型安全**: 完整保留 TypeScript 类型定义
 4. **样式复用**: 最大化复用现有 TailwindCSS 样式类
 5. **测试先行**: 为关键组件编写测试用例后再重构
+6. **桌面端优先**: 以桌面端布局为主，不做移动端特殊适配
 
 ---
 
@@ -96,7 +97,7 @@ frontend/src/
 | 组件 | 复杂度 | 重构工作量 | 说明 |
 |------|--------|------------|------|
 | **布局组件** |
-| Header | 低 | 1h | 响应式导航、主题切换 |
+| Header | 低 | 0.5h | 导航栏、主题切换 |
 | Footer | 低 | 0.5h | 静态内容 |
 | ThemeToggle | 低 | 0.5h | 主题切换按钮 |
 | **通用组件** |
@@ -314,12 +315,11 @@ export const useTotalTokens = () => useStatsStore(state => {
 
 ---
 
-### Phase 3: 通用组件重构 [预计: 6h]
+### Phase 3: 通用组件重构 [预计: 5.5h]
 
 #### P3-1: 布局组件
-- [ ] `Header.tsx` - 响应式导航栏
+- [ ] `Header.tsx` - 桌面端导航栏
   - 移植 Logo、导航链接、主题切换
-  - 实现移动端汉堡菜单
 - [ ] `Footer.tsx` - 页面底部
 - [ ] `ThemeToggle.tsx` - 主题切换按钮
   - 集成 `useThemeStore`
@@ -344,7 +344,7 @@ export const useTotalTokens = () => useStatsStore(state => {
 **验证标准**:
 - 所有组件独立渲染正常
 - Props 类型检查通过
-- 响应式布局正常
+- 桌面端布局正常
 - 暗色模式样式正确
 
 ---
@@ -393,7 +393,7 @@ export const useTotalTokens = () => useStatsStore(state => {
 **验证标准**:
 - 图表渲染性能达标（< 100ms）
 - 交互响应流畅
-- 响应式适配正常
+- 桌面端布局正常
 - 数据更新时平滑过渡
 
 ---
@@ -523,7 +523,7 @@ export const useTotalTokens = () => useStatsStore(state => {
 - [ ] 所有仪表板面板功能完整
 - [ ] 实时 WebSocket 数据更新正常
 - [ ] 主题切换 + 持久化正常
-- [ ] 响应式布局（移动端/平板/桌面）正常
+- [ ] 桌面端布局正常（不做移动端特殊适配）
 - [ ] 无障碍键盘导航正常
 
 ### 6.2 性能验收
@@ -547,13 +547,13 @@ export const useTotalTokens = () => useStatsStore(state => {
 | Phase 0: 环境准备 | 2h | 2h |
 | Phase 1: 类型与工具迁移 | 1h | 3h |
 | Phase 2: 状态管理重构 | 4h | 7h |
-| Phase 3: 通用组件重构 | 6h | 13h |
-| Phase 4: 图表组件重构 | 16h | 29h |
-| Phase 5: 仪表板面板重构 | 8h | 37h |
-| Phase 6: 主应用集成 | 4h | 41h |
-| Phase 7: 测试与优化 | 6h | 47h |
-| Phase 8: 文档与清理 | 2h | 49h |
-| **总计** | **49h** | - |
+| Phase 3: 通用组件重构 | 5.5h | 12.5h |
+| Phase 4: 图表组件重构 | 16h | 28.5h |
+| Phase 5: 仪表板面板重构 | 8h | 36.5h |
+| Phase 6: 主应用集成 | 4h | 40.5h |
+| Phase 7: 测试与优化 | 6h | 46.5h |
+| Phase 8: 文档与清理 | 2h | 48.5h |
+| **总计** | **48.5h** | - |
 
 > **备注**: 预估基于单人开发，实际可根据团队情况并行开发部分阶段。
 
@@ -589,6 +589,7 @@ export const useTotalTokens = () => useStatsStore(state => {
 | 图表库 | Recharts | React 原生、社区活跃、文档完善 |
 | UI 组件 | Radix UI | 无样式、可访问性好、与 TailwindCSS 配合 |
 | 构建工具 | Vite | 保持一致，迁移成本低 |
+| 响应式策略 | 桌面端优先 | 目标用户为开发者，主要使用桌面设备访问监控面板 |
 
 ### C. 参考资源
 
