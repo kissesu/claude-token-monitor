@@ -10,6 +10,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 pub mod db;
+pub mod commands;
 pub mod models;
 pub mod services;
 
@@ -70,12 +71,11 @@ pub fn run() {
         // ============================================
         .invoke_handler(tauri::generate_handler![
             greet,
-            // 后续阶段会添加：
-            // get_current_stats,
-            // get_today_provider_stats,
-            // get_daily_activities,
-            // get_providers,
-            // update_provider_name,
+            commands::stats::get_current_stats,
+            commands::stats::get_today_provider_stats,
+            commands::stats::get_daily_activities,
+            commands::provider::get_providers,
+            commands::provider::update_provider_name,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running Tauri application");

@@ -1287,7 +1287,7 @@ pnpm tauri dev 2>&1 | grep -E "(file_watcher|parser|db)"
 | `get_current_stats` | 获取当前统计 | - | `StatsCache` |
 | `get_today_provider_stats` | 今日供应商统计 | - | `ProviderStats[]` |
 | `get_daily_activities` | 每日活动记录 | `start_date`, `end_date` | `DailyActivity[]` |
-| `get_providers` | 供应商列表 | - | `Provider[]` |
+| `get_providers` | 供应商列表 | `active_only?` | `Provider[]` |
 | `update_provider_name` | 更新供应商名称 | `provider_id`, `display_name` | `void` |
 
 **Events 清单**:
@@ -1299,33 +1299,37 @@ pnpm tauri dev 2>&1 | grep -E "(file_watcher|parser|db)"
 | `file-changed` | 文件变更 | `string[]` (路径列表) |
 
 #### P2-1: 定义 Tauri Commands
-- [ ] `get_current_stats` - 获取当前统计
-- [ ] `get_today_provider_stats` - 获取今日供应商统计
-- [ ] `get_daily_activities` - 获取每日活动
-- [ ] `get_providers` - 获取供应商列表
-- [ ] `update_provider_name` - 更新供应商名称
+- [x] `get_current_stats` - 获取当前统计
+- [x] `get_today_provider_stats` - 获取今日供应商统计
+- [x] `get_daily_activities` - 获取每日活动
+- [x] `get_providers` - 获取供应商列表（支持 `active_only` 可选参数）
+- [x] `update_provider_name` - 更新供应商名称
 
 #### P2-2: 定义 Tauri Events
 - [ ] `stats-updated` - 统计数据更新
 - [ ] `provider-switched` - 供应商切换
-- [ ] `file-changed` - 文件变更通知
+- [x] `file-changed` - 文件变更通知
 
 #### P2-3: 前端类型定义
-- [ ] 创建 `src/types/tauri.ts`
-- [ ] 定义 Command 参数和返回类型
-- [ ] 定义 Event payload 类型
+- [x] 创建 `src/types/tauri.ts`
+- [x] 定义 Command 参数和返回类型
+- [x] 定义 Event payload 类型
 
 #### P2-4: 前端 Hooks
-- [ ] 创建 `src/hooks/useTauriCommand.ts`
-- [ ] 创建 `src/hooks/useTauriEvents.ts`
+- [x] 创建 `src/hooks/useTauriCommand.ts`
+- [x] 创建 `src/hooks/useTauriEvents.ts`
 
 **验收标准**: 前端可成功调用 Tauri Commands 并接收 Events
+
+**当前进度**: Commands 与前端 IPC 已完成；Events 中 `file-changed` 已接入，`stats-updated` 与 `provider-switched` 待实现
 
 ---
 
 ### Phase 3: React 基础架构
 
 **目标**: 类型、Store、布局、主题系统完成
+
+**当前进度**: 未开始（等待 Phase 2 完成并验收）
 
 | 任务 ID | 任务描述 | 依赖 | 交付物 |
 |---------|----------|------|--------|
