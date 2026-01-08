@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { AppState, LogEntry } from '../types/store';
-// import { invoke } from '@tauri-apps/api/core'; // Tauri 2.0
-// import { StatsCache, Provider } from '../types/tauri';
+import { tauriCommands } from '../hooks/useTauriCommand';
 
 export const useAppStore = create<AppState>((set) => ({
   stats: null,
   dailyActivities: [],
+  todayStats: null,
   providers: [],
   activeProviderId: null,
   logs: [
@@ -24,26 +24,44 @@ export const useAppStore = create<AppState>((set) => ({
   fetchStats: async () => {
     set({ isLoading: true });
     try {
-      // TODO: Replace with actual Tauri invoke
-      // const stats = await invoke<StatsCache>('get_stats');
-      // set({ stats });
-      
-      // Mock data for Phase 3 visual verification
+      const stats = await tauriCommands.getCurrentStats();
+      const todayProviderStats = await tauriCommands.getTodayProviderStats();
+      const today = new Date();
+      const end_date = today.toISOString().slice(0, 10);
+      const start_date = new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+      const dailyActivities = await tauriCommands.getDailyActivities({
+        start_date,
+        end_date
+      });
+
+      const todayTotals = todayProviderStats.reduce(
+        (acc, item) => ({
+          input_tokens: acc.input_tokens + item.today_input_tokens,
+          output_tokens: acc.output_tokens + item.today_output_tokens,
+          cache_read_tokens: acc.cache_read_tokens + item.today_cache_read_tokens,
+          cost_usd: acc.cost_usd + item.today_cost_usd
+        }),
+        {
+          input_tokens: 0,
+          output_tokens: 0,
+          cache_read_tokens: 0,
+          cost_usd: 0
+        }
+      );
+
+      const total_tokens = todayTotals.cache_read_tokens + todayTotals.input_tokens;
+      const cache_hit_rate = total_tokens > 0 ? todayTotals.cache_read_tokens / total_tokens : 0;
+
       set(() => ({
-        stats: {
-          total_input_tokens: 800230,
-          total_output_tokens: 400120,
-          total_cache_read_tokens: 2500000,
-          total_cache_creation_tokens: 100000,
-          total_cost_usd: 29.96,
-          total_sessions: 24,
-          total_messages: 1450,
-          cache_hit_rate: 0.845,
-          models: [],
-          updated_at: new Date().toISOString()
+        stats,
+        dailyActivities,
+        todayStats: {
+          ...todayTotals,
+          cache_hit_rate
         }
       }));
-
     } catch (e) {
       set({ error: (e as Error).message });
     } finally {

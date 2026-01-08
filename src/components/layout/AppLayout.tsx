@@ -23,7 +23,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       <div className="relative z-10 flex h-full">
         {/* Sidebar */}
-        <aside className="w-[68px] flex flex-col items-center py-6 border-r border-border/50 bg-bg/80 backdrop-blur-sm relative z-10">
+        <aside className="w-[4.25rem] flex flex-col items-center py-6 border-r border-border/50 bg-bg/80 backdrop-blur-sm relative z-10">
           <div className="w-10 h-10 rounded-xl bg-neonPrimary/10 flex items-center justify-center mb-8 border border-neonPrimary/20 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
             <Aperture className="w-6 h-6 text-neonPrimary" />
           </div>
@@ -71,8 +71,8 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-8 pb-8">
-            <div className="max-w-6xl mx-auto space-y-6">
+          <div className="flex-1 px-8 pb-8">
+            <div className="w-full h-full space-y-6">
               {children}
             </div>
           </div>

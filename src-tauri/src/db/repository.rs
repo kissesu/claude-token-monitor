@@ -164,6 +164,16 @@ impl Repository {
     ) -> Result<(), RepositoryError> {
         let conn = self.connection()?;
 
+        let date = extract_date(&record.created_at);
+        let session_exists: Option<i64> = conn
+            .query_row(
+                "SELECT 1 FROM message_usage WHERE provider_id = ?1 AND session_id = ?2 AND date(created_at) = ?3 LIMIT 1",
+                params![provider_id, record.session_id, date],
+                |row| row.get(0),
+            )
+            .optional()?;
+        let session_increment = if session_exists.is_some() { 0 } else { 1 };
+
         conn.execute(
             "INSERT INTO message_usage (provider_id, session_id, message_id, model, input_tokens, output_tokens, cache_read_tokens, cache_creation_tokens, cost_usd, created_at)
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
@@ -180,18 +190,6 @@ impl Repository {
                 record.created_at
             ],
         )?;
-
-        let date = extract_date(&record.created_at);
-
-        let session_exists: Option<i64> = conn
-            .query_row(
-                "SELECT 1 FROM message_usage WHERE provider_id = ?1 AND session_id = ?2 AND date(created_at) = ?3 LIMIT 1",
-                params![provider_id, record.session_id, date],
-                |row| row.get(0),
-            )
-            .optional()?;
-
-        let session_increment = if session_exists.is_some() { 0 } else { 1 };
 
         conn.execute(
             "INSERT INTO daily_stats (provider_id, date, total_input_tokens, total_output_tokens, total_cache_read_tokens, total_cache_creation_tokens, total_cost_usd, session_count, message_count)

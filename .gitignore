@@ -70,6 +70,7 @@ docs/
 ~/
 src-tauri/src/CLAUDE.md
 src/CLAUDE.md
+.gemini-clipboard/
 
 # 测试覆盖率
 .coverage

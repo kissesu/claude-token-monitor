@@ -14,6 +14,8 @@ use thiserror::Error;
 pub enum FileWatcherError {
     #[error("Failed to create watcher: {0}")]
     WatcherCreation(#[from] notify::Error),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
     #[error("Home directory not found")]
     HomeDirNotFound,
 }
@@ -47,20 +49,12 @@ impl FileWatcher {
 
     /// 启动监控
     pub fn start(&mut self) -> Result<(), FileWatcherError> {
-        // 监控 settings.json
-        self.watcher
-            .watch(&self.claude_dir.join("settings.json"), RecursiveMode::NonRecursive)?;
-
-        // 监控 projects 目录
-        self.watcher
-            .watch(&self.claude_dir.join("projects"), RecursiveMode::Recursive)?;
-
-        // 监控 stats-cache.json（可选）
-        let stats_cache = self.claude_dir.join("stats-cache.json");
-        if stats_cache.exists() {
-            self.watcher
-                .watch(&stats_cache, RecursiveMode::NonRecursive)?;
+        if !self.claude_dir.exists() {
+            std::fs::create_dir_all(&self.claude_dir)?;
         }
+
+        self.watcher
+            .watch(&self.claude_dir, RecursiveMode::Recursive)?;
 
         println!("文件监控已启动: {}", self.claude_dir.display());
 

@@ -1051,7 +1051,7 @@ CREATE INDEX IF NOT EXISTS idx_daily_stats_provider ON daily_stats(provider_id);
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Phase 2 │ IPC 通信层      │ Tauri Commands + Events，前后端打通             │
 ├──────────────────────────────────────────────────────────────────────────────┤
-│ Phase 3 │ React 基础架构  │ 类型、Store、布局、主题                         │
+│ Phase 3 │ React 基础架构  │ 已完成 (类型、Store、布局、Indigo 主题)        │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Phase 4 │ 核心数据展示    │ StatCard、数据表格、实时更新                    │
 ├──────────────────────────────────────────────────────────────────────────────┤
@@ -1329,43 +1329,46 @@ pnpm tauri dev 2>&1 | grep -E "(file_watcher|parser|db)"
 
 **目标**: 类型、Store、布局、主题系统完成
 
-**当前进度**: 未开始（等待 Phase 2 完成并验收）
+**当前进度**: 已完成 (基于 Indigo Edition 设计稿)
 
 | 任务 ID | 任务描述 | 依赖 | 交付物 |
 |---------|----------|------|--------|
-| P3-1 | 类型定义 | P2 完成 | `types/stats.ts`、`types/provider.ts` |
-| P3-2 | Zustand Stores | P3-1 | `stores/useStatsStore.ts`、`useProviderStore.ts`、`useThemeStore.ts` |
-| P3-3 | 布局组件 - Header | P3-2 | `components/layout/Header.tsx` |
-| P3-4 | 布局组件 - Sidebar | P3-2 | `components/layout/Sidebar.tsx` (桌面端导航) |
-| P3-5 | 主题系统 | P3-2 | `hooks/useTheme.ts`、`ThemeToggle.tsx` |
-| P3-6 | App 集成 | P3-3~P3-5 | 更新 `App.tsx`，整合布局和主题 |
+| P3-1 | 类型定义 | P2 完成 | `types/store.ts` (AppState, LogEntry) |
+| P3-2 | Zustand Stores | P3-1 | `store/index.ts` (统一 AppStore) |
+| P3-3 | 布局组件 - AppLayout | P3-2 | `components/layout/AppLayout.tsx` |
+| P3-4 | Indigo 主题适配 | P3-3 | `tailwind.config.js`, `index.css` (霓虹色、动画) |
+| P3-5 | 仪表盘基础组件 | P3-3 | `KPIGrid.tsx`, `FlowChart.tsx`, `RealTimeLogs.tsx` |
+| P3-6 | App 集成 | P3-3~P3-5 | 更新 `App.tsx`，整合 Indigo UI 结构 |
 
 #### P3-1: 类型定义
-- [ ] 创建 `src/types/stats.ts`
-- [ ] 创建 `src/types/provider.ts`
-- [ ] 创建 `src/types/index.ts`
+- [x] 创建 `src/types/store.ts` (定义 AppState 与 LogEntry)
+- [x] 复用 `src/types/tauri.ts` 中的后端数据结构
 
 #### P3-2: Zustand Stores
-- [ ] 创建 `src/stores/useStatsStore.ts`
-- [ ] 创建 `src/stores/useProviderStore.ts`
-- [ ] 创建 `src/stores/useThemeStore.ts`
+- [x] 创建 `src/store/index.ts`
+- [x] 实现模拟数据以支撑 Phase 3 视觉验证
+- [x] 实现基础 Action (fetchStats, addLog)
 
 #### P3-3: 布局组件
-- [ ] 创建 `src/components/layout/Header.tsx`
-- [ ] 创建 `src/components/layout/Sidebar.tsx`（桌面端导航）
-- [ ] 创建 `src/components/layout/ThemeToggle.tsx`
+- [x] 创建 `src/components/layout/AppLayout.tsx` (侧边栏 + 顶部导航)
+- [x] 集成 `lucide-react` 图标系统
 
-#### P3-4: 主题系统
-- [ ] 创建 `src/hooks/useTheme.ts`
-- [ ] 实现暗色/亮色模式切换
-- [ ] localStorage 持久化
+#### P3-4: 主题与样式
+- [x] 更新 `tailwind.config.js` 为 Indigo Edition 霓虹主题
+- [x] 配置 `index.css` (滚动条、Bento 卡片工具类、动画延迟)
+- [x] 实现暗色模式切换逻辑 (基于 class 策略)
 
-#### P3-5: App 集成
-- [ ] 更新 `App.tsx` 使用布局组件
-- [ ] 集成主题系统
-- [ ] 集成 Tauri 事件监听
+#### P3-5: 仪表盘组件化
+- [x] 实现 `KPIGrid.tsx` (Bento 风格 KPI 卡片)
+- [x] 实现 `FlowChart.tsx` (流量详情与趋势模拟图)
+- [x] 实现 `RealTimeLogs.tsx` (实时日志表格)
 
-**验收标准**: 应用有完整布局，主题切换正常，Store 响应式更新
+#### P3-6: App 集成
+- [x] 更新 `App.tsx` 移除 Vite 默认代码
+- [x] 集成 `AppLayout` 作为主容器
+- [x] 挂载数据获取生命周期
+
+**验收标准**: 应用具备高保真 Indigo UI 布局，主题切换正常，Store 模拟数据展示正常
 
 ---
 

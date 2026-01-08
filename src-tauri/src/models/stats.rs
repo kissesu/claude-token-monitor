@@ -183,7 +183,8 @@ impl StatsCache {
     /// 1. 对 models 列表按 cost_usd 字段降序排序
     /// 2. 方便前端展示时优先显示费用最高的模型
     pub fn sort_models_by_cost(&mut self) {
-        self.models.sort_by(|a, b| b.cost_usd.partial_cmp(&a.cost_usd).unwrap());
+        self.models
+            .sort_by(|a, b| b.cost_usd.total_cmp(&a.cost_usd));
     }
 }
 
