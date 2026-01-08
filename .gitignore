@@ -68,6 +68,8 @@ logs/
 .serena/
 docs/
 ~/
+src-tauri/src/CLAUDE.md
+src/CLAUDE.md
 
 # 测试覆盖率
 .coverage
