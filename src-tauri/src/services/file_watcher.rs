@@ -34,6 +34,7 @@ impl FileWatcher {
             if let Ok(event) = event {
                 match event.kind {
                     notify::EventKind::Modify(_) | notify::EventKind::Create(_) => {
+                        println!("检测到文件变更: {:?}", event.paths);
                         let _ = app.emit("file-changed", event.paths);
                     }
                     _ => {}
@@ -60,6 +61,8 @@ impl FileWatcher {
             self.watcher
                 .watch(&stats_cache, RecursiveMode::NonRecursive)?;
         }
+
+        println!("文件监控已启动: {}", self.claude_dir.display());
 
         Ok(())
     }

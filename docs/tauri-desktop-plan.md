@@ -1192,33 +1192,45 @@ sha2 = "0.10"          # API Key 哈希
 tokio = "1"            # 异步运行时
 ```
 
+**当前进度**: P1-1 ~ P1-7 已完成（`cargo test` 通过）
+
 #### P1-1: 数据库模块
-- [ ] 创建 `src-tauri/src/db/schema.rs`
-- [ ] 实现数据库初始化和迁移
-- [ ] 实现基础 CRUD 操作
-- [ ] 单元测试
+- [x] 创建 `src-tauri/src/db/schema.rs`
+- [x] 实现数据库初始化和迁移
+- [x] 实现基础 CRUD 操作
+- [x] 单元测试
 
 #### P1-2: 文件监控服务
-- [ ] 创建 `src-tauri/src/services/file_watcher.rs`
-- [ ] 实现 `~/.claude/settings.json` 监控
-- [ ] 实现 `~/.claude/projects/*/*.jsonl` 监控
-- [ ] 文件变更事件发射
+- [x] 创建 `src-tauri/src/services/file_watcher.rs`
+- [x] 实现 `~/.claude/settings.json` 监控
+- [x] 实现 `~/.claude/projects/*/*.jsonl` 监控
+- [x] 文件变更事件发射
 
 #### P1-3: 解析服务
-- [ ] 创建 `src-tauri/src/services/parser.rs`
-- [ ] 实现 settings.json 解析（提取 API Key）
-- [ ] 实现 JSONL 消息解析（提取 Token 使用）
-- [ ] API Key 哈希处理
+- [x] 创建 `src-tauri/src/services/parser.rs`
+- [x] 实现 settings.json 解析（提取 API Key）
+- [x] 实现 JSONL 消息解析（提取 Token 使用）
+- [x] API Key 哈希处理
 
 #### P1-4: 供应商跟踪服务
-- [ ] 创建 `src-tauri/src/services/provider_tracker.rs`
-- [ ] 实现供应商识别和切换检测
-- [ ] 实现消息-供应商关联
+- [x] 创建 `src-tauri/src/services/provider_tracker.rs`
+- [x] 实现供应商识别和切换检测
+- [x] 实现消息-供应商关联
 
 #### P1-5: 价格计算服务
-- [ ] 创建 `src-tauri/src/services/pricing.rs`
-- [ ] 实现各模型价格计算
-- [ ] 缓存 Token 价格折扣
+- [x] 创建 `src-tauri/src/services/pricing.rs`
+- [x] 实现各模型价格计算
+- [x] 缓存 Token 价格折扣
+
+#### P1-6: 数据模型定义
+- [x] 创建 `src-tauri/src/models/stats.rs`
+- [x] 创建 `src-tauri/src/models/provider.rs`
+- [x] 创建 `src-tauri/src/models/message.rs`
+
+#### P1-7: Rust 单元测试
+- [x] 数据库操作测试
+- [x] 解析服务测试
+- [x] 价格计算测试
 
 **验收标准**: 所有 Rust 服务单元测试通过
 
