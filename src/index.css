@@ -13,9 +13,18 @@
   .delay-200 { animation-delay: 200ms; }
   .delay-300 { animation-delay: 300ms; }
   .delay-400 { animation-delay: 400ms; }
+
+  /* 隐藏滚动条但允许滚动 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar (Global default) */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -23,6 +32,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 2px;
 }

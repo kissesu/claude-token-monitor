@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Aperture, LayoutGrid, BarChart2, Layers, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Aperture, LayoutGrid, Layers, ChevronDown, Sun, Moon, Settings as SettingsIcon } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -7,6 +8,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [isDark, setIsDark] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     if (isDark) {
@@ -15,6 +17,8 @@ export function AppLayout({ children }: AppLayoutProps) {
       document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="bg-bg text-secondary h-screen w-screen overflow-hidden font-sans selection:bg-neonPrimary/20 selection:text-neonPrimary relative">
@@ -28,15 +32,15 @@ export function AppLayout({ children }: AppLayoutProps) {
             <Aperture className="w-6 h-6 text-neonPrimary" />
           </div>
           <nav className="flex flex-col gap-4 w-full px-2">
-            <a href="#" className="w-full aspect-square rounded-lg flex items-center justify-center bg-white/5 text-primary shadow-sm border border-white/5 transition-all">
-              <LayoutGrid className="w-5 h-5 text-neonPrimary" />
-            </a>
-            <a href="#" className="w-full aspect-square rounded-lg flex items-center justify-center text-secondary hover:bg-white/5 hover:text-primary transition-all">
-              <BarChart2 className="w-5 h-5" />
-            </a>
-            <a href="#" className="w-full aspect-square rounded-lg flex items-center justify-center text-secondary hover:bg-white/5 hover:text-primary transition-all">
-              <Layers className="w-5 h-5" />
-            </a>
+            <Link to="/" className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all ${isActive('/') ? 'bg-white/5 text-primary shadow-sm border border-white/5' : 'text-secondary hover:bg-white/5 hover:text-primary'}`}>
+              <LayoutGrid className={`w-5 h-5 ${isActive('/') ? 'text-neonPrimary' : ''}`} />
+            </Link>
+            <Link to="/providers" className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all ${isActive('/providers') ? 'bg-white/5 text-primary shadow-sm border border-white/5' : 'text-secondary hover:bg-white/5 hover:text-primary'}`}>
+              <Layers className={`w-5 h-5 ${isActive('/providers') ? 'text-neonPrimary' : ''}`} />
+            </Link>
+            <Link to="/settings" className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all ${isActive('/settings') ? 'bg-white/5 text-primary shadow-sm border border-white/5' : 'text-secondary hover:bg-white/5 hover:text-primary'}`}>
+              <SettingsIcon className={`w-5 h-5 ${isActive('/settings') ? 'text-neonPrimary' : ''}`} />
+            </Link>
           </nav>
           <div className="mt-auto flex flex-col gap-4 items-center">
             <button className="w-10 h-10 rounded-full bg-panel border border-border flex items-center justify-center hover:border-neonPrimary/50 transition-colors relative">
@@ -50,7 +54,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         <main className="flex-1 flex flex-col min-w-0 relative z-10">
           <header className="h-16 flex items-center justify-between px-8 shrink-0 animate-fade-in">
             <div>
-              <h1 className="font-display text-xl font-medium text-primary tracking-tight">仪表盘</h1>
+              <h1 className="font-display text-xl font-medium text-primary tracking-tight">
+                {location.pathname === '/' ? '仪表盘' : location.pathname === '/providers' ? '供应商' : '设置'}
+              </h1>
               <div className="flex items-center gap-2 text-xs text-secondary/60 font-mono mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 实时监控中
@@ -71,8 +77,8 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </header>
 
-          <div className="flex-1 px-8 pb-8">
-            <div className="w-full h-full space-y-6">
+          <div className="flex-1 px-8 pb-8 min-h-0">
+            <div className="w-full h-full">
               {children}
             </div>
           </div>
