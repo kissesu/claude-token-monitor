@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Monitor - Ultimate Design Spec v2.3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['Menlo', 'Monaco', 'Courier New', 'monospace'],
+                    },
+                    colors: {
+                        window: "hsl(240 10% 3.9%)",
+                        sidebar: "hsl(240 10% 3.9% / 0.95)",
+                        surface: "hsl(240 5% 6%)",
+                        surface2: "hsl(240 5% 10%)",
+                        border: "hsl(240 3.7% 15.9%)",
+                        primary: "hsl(240 5.9% 90%)",
+                        muted: "hsl(240 5% 64.9%)",
+                        accent: "hsl(21, 90%, 48%)",      // Orange (Brand/Cache Hit)
+                        tokenIn: "hsl(217, 91%, 60%)",    // Blue (Input)
+                        tokenOut: "hsl(270, 95%, 65%)",   // Purple (Output)
+                        tokenCache: "hsl(142, 71%, 45%)", // Green (Cache Write)
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        
+        .spec-label {
+            @apply text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20 inline-block mb-1 select-all;
+        }
+        .code-val {
+            @apply font-mono text-zinc-200 bg-white/5 px-1 rounded text-[10px] select-all;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-300 h-screen w-screen overflow-hidden flex">
+
+    <!-- LEFT PANEL: UI Preview (Same as v2.2) -->
+    <div class="flex-1 bg-[#1e1e1e] flex items-center justify-center p-8 border-r border-zinc-800 relative bg-[radial-gradient(#3f3f46_1px,transparent_1px)] [background-size:16px_16px]">
+        <div class="absolute top-4 left-4 px-3 py-1 bg-zinc-900 border border-zinc-700 rounded-full text-xs font-medium text-zinc-400">
+            UI Preview (1200x800)
+        </div>
+
+        <!-- APP WINDOW START -->
+        <div class="w-[1000px] h-[720px] bg-window rounded-xl shadow-2xl border border-zinc-800 flex overflow-hidden ring-1 ring-white/10 relative text-[13px] leading-normal font-sans select-none transition-colors duration-300">
+            <!-- Sidebar -->
+            <aside class="w-[240px] flex flex-col border-r border-border bg-sidebar relative z-20">
+                <div class="h-[38px] px-4 flex items-center shrink-0">
+                    <div class="flex gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                        <div class="w-3 h-3 rounded-full bg-[#FF5F57] shadow-sm"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#FEBC2E] shadow-sm"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#28C840] shadow-sm"></div>
+                    </div>
+                </div>
+                <div class="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+                    <div class="px-3 py-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1">监控</div>
+                    <a href="#" class="flex items-center gap-2.5 px-3 py-1.5 rounded-md bg-white/10 text-white font-medium">
+                        <i data-lucide="layout-grid" class="w-4 h-4 text-accent"></i> 仪表盘
+                    </a>
+                    <a href="#" class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-muted hover:text-white hover:bg-white/5 transition-colors">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 统计分析
+                    </a>
+                    <div class="mt-6 px-3 py-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1">历史</div>
+                    <a href="#" class="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-muted hover:text-white hover:bg-white/5 transition-colors">
+                        <i data-lucide="clock" class="w-4 h-4"></i> 最近会话
+                    </a>
+                </div>
+                <div class="p-3 border-t border-border mt-auto">
+                    <button class="w-full flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-white/5 transition-colors text-left group">
+                        <div class="w-7 h-7 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white shadow-inner">OI</div>
+                        <div class="flex-1 min-w-0"><div class="text-xs font-medium text-primary truncate">Atlas.oi</div></div>
+                        <i data-lucide="settings-2" class="w-3.5 h-3.5 text-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 flex flex-col bg-surface min-w-0">
+                <header class="h-[38px] flex items-center justify-between px-4 border-b border-border bg-surface shrink-0">
+                    <div class="flex items-center gap-2 text-xs font-medium text-muted">
+                        <span class="text-primary">仪表盘</span><span>/</span><span>今日概览</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <button class="flex items-center justify-center w-7 h-7 rounded hover:bg-white/5 text-muted hover:text-primary transition-colors">
+                            <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                        </button>
+                        <div class="w-px h-3 bg-border mx-1"></div>
+                        <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/5 transition-colors text-xs text-primary border border-transparent hover:border-border">
+                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span>Personal API</span><i data-lucide="chevron-down" class="w-3 h-3 text-muted"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="flex-1 overflow-y-auto p-5">
+                    <div class="max-w-5xl mx-auto space-y-4">
+                        <!-- Row 1 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-surface2 border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2"><div class="text-xs font-medium text-muted">总费用 (估算)</div><i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-muted/50"></i></div>
+                                <div class="text-2xl font-bold text-white">¥29.96</div>
+                                <div class="mt-2 flex items-center text-[11px] text-emerald-400"><i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +12.5%</div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2"><div class="text-xs font-medium text-muted">缓存节省</div><i data-lucide="piggy-bank" class="w-3.5 h-3.5 text-muted/50"></i></div>
+                                <div class="text-2xl font-bold text-white">¥8.40</div>
+                                <div class="w-full bg-white/5 h-1.5 mt-3 rounded-full overflow-hidden flex"><div class="bg-accent h-full w-[84.5%]"></div></div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2"><div class="text-xs font-medium text-muted">缓存命中率</div><i data-lucide="database" class="w-3.5 h-3.5 text-muted/50"></i></div>
+                                <div class="text-2xl font-bold text-white">84.5%</div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2"><div class="text-xs font-medium text-muted">活跃会话</div><i data-lucide="activity" class="w-3.5 h-3.5 text-muted/50"></i></div>
+                                <div class="text-2xl font-bold text-white">24</div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-surface2 border border-border rounded-lg p-3 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-md bg-tokenIn/10 flex items-center justify-center shrink-0"><i data-lucide="arrow-right-to-line" class="w-4 h-4 text-tokenIn"></i></div>
+                                <div><div class="text-[10px] text-muted uppercase font-medium">输入 Token</div><div class="text-sm font-bold text-white">800,230</div></div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-3 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-md bg-tokenOut/10 flex items-center justify-center shrink-0"><i data-lucide="arrow-left-from-line" class="w-4 h-4 text-tokenOut"></i></div>
+                                <div><div class="text-[10px] text-muted uppercase font-medium">输出 Token</div><div class="text-sm font-bold text-white">400,120</div></div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-3 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-md bg-tokenCache/10 flex items-center justify-center shrink-0"><i data-lucide="save" class="w-4 h-4 text-tokenCache"></i></div>
+                                <div><div class="text-[10px] text-muted uppercase font-medium">缓存写入</div><div class="text-sm font-bold text-white">50,000</div></div>
+                            </div>
+                            <div class="bg-surface2 border border-border rounded-lg p-3 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-md bg-accent/10 flex items-center justify-center shrink-0"><i data-lucide="zap" class="w-4 h-4 text-accent"></i></div>
+                                <div><div class="text-[10px] text-muted uppercase font-medium">缓存读取 (Hit)</div><div class="text-sm font-bold text-white">2,500,000</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="grid grid-cols-3 gap-4 h-[300px]">
+                            <div class="col-span-2 bg-surface2 border border-border rounded-lg p-4 flex flex-col">
+                                <div class="flex items-center justify-between mb-4"><h3 class="text-sm font-medium text-primary">Token 使用趋势</h3></div>
+                                <div class="flex-1 flex items-end justify-between gap-1 px-2 pb-2 border-b border-l border-white/5 relative">
+                                    <div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20"><div class="w-full h-px bg-white/20"></div><div class="w-full h-px bg-white/20"></div><div class="w-full h-px bg-white/20"></div></div>
+                                    <div class="w-full bg-white/5 h-[30%] rounded-t-sm"></div><div class="w-full bg-white/5 h-[45%] rounded-t-sm"></div><div class="w-full bg-white/5 h-[25%] rounded-t-sm"></div><div class="w-full bg-white/5 h-[60%] rounded-t-sm"></div><div class="w-full bg-accent hover:opacity-90 h-[85%] rounded-t-sm transition-all shadow-[0_0_10px_rgba(234,88,12,0.3)]"></div><div class="w-full bg-white/5 h-[50%] rounded-t-sm"></div><div class="w-full bg-white/5 h-[35%] rounded-t-sm"></div>
+                                </div>
+                            </div>
+                            <div class="col-span-1 bg-surface2 border border-border rounded-lg flex flex-col overflow-hidden">
+                                <div class="p-3 border-b border-border bg-white/5"><h3 class="text-sm font-medium text-primary">费用分布</h3></div>
+                                <div class="flex-1 overflow-y-auto p-0">
+                                    <table class="w-full text-left border-collapse">
+                                        <tbody>
+                                            <tr class="border-b border-border/50 hover:bg-white/5"><td class="p-3"><div class="text-xs font-medium text-primary">Sonnet 3.5</div></td><td class="p-3 text-right"><div class="text-xs font-bold text-white">¥21.70</div></td></tr>
+                                            <tr class="border-b border-border/50 hover:bg-white/5"><td class="p-3"><div class="text-xs font-medium text-primary">Opus 3</div></td><td class="p-3 text-right"><div class="text-xs font-bold text-white">¥6.65</div></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 4 -->
+                        <div>
+                             <h3 class="text-sm font-medium text-primary mb-3">实时日志流</h3>
+                             <div class="bg-surface2 border border-border rounded-lg overflow-hidden">
+                                 <div class="grid grid-cols-[80px_120px_1fr_100px] gap-4 px-4 py-2 border-b border-border text-[11px] font-medium text-muted uppercase tracking-wider bg-white/5"><div>时间</div> <div>模型</div> <div>项目 / 会话 ID</div> <div class="text-right">费用</div></div>
+                                 <div class="grid grid-cols-[80px_120px_1fr_100px] gap-4 px-4 py-2.5 border-b border-border/50 hover:bg-white/5 transition-colors items-center text-xs">
+                                     <div class="font-mono text-muted">10:42:15</div><div><span class="px-1.5 py-0.5 rounded bg-accent/20 text-accent text-[10px] font-medium border border-accent/20">Sonnet 3.5</span></div><div class="text-primary truncate">claude-monitor / fix-ui-bug</div><div class="text-right text-white">¥0.08</div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- APP WINDOW END -->
+    </div>
+
+    <!-- RIGHT PANEL: Full Design Specs -->
+    <div class="w-[450px] bg-zinc-900 border-l border-zinc-800 flex flex-col h-full shadow-2xl z-10">
+        <div class="h-14 border-b border-zinc-800 flex items-center px-6 bg-zinc-900/50 backdrop-blur">
+            <h2 class="font-semibold text-zinc-100">Design Specs v2.3</h2>
+            <span class="ml-2 text-xs text-emerald-400 bg-emerald-400/10 px-1 rounded">FINAL</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            
+            <!-- Global Specs -->
+            <section>
+                <h3 class="text-sm font-bold text-white mb-3 text-emerald-400">1. Global Variables</h3>
+                <div class="grid grid-cols-2 gap-2 text-xs text-zinc-400">
+                    <div>Background: <code class="code-val">bg-window</code></div>
+                    <div>Text Primary: <code class="code-val">text-primary</code></div>
+                    <div>Border: <code class="code-val">border-border</code></div>
+                    <div>Font: <code class="code-val">system-ui</code></div>
+                </div>
+            </section>
+
+            <!-- Row 1 Specs -->
+            <section>
+                <h3 class="text-sm font-bold text-white mb-3">2. Core KPI Cards (Row 1)</h3>
+                <div class="space-y-2 text-xs text-zinc-400">
+                    <p>Standard Card Style:</p>
+                    <code class="code-val block">bg-surface2 border border-border rounded-lg p-4</code>
+                    <p class="mt-2">Hover Effect:</p>
+                    <code class="code-val block">hover:border-white/20 transition-colors</code>
+                </div>
+            </section>
+
+            <!-- Row 2 Specs (NEW) -->
+            <section>
+                <h3 class="text-sm font-bold text-white mb-3">3. Token Flow Grid (Row 2)</h3>
+                <div class="space-y-4 text-xs text-zinc-400">
+                    <p>Layout: 4-col grid. Each card has a specific semantic color.</p>
+                    
+                    <div class="border-l-2 border-blue-400 pl-3">
+                        <strong class="text-blue-400 block mb-1">Input Token</strong>
+                        Color: <code class="code-val text-blue-400">hsl(217, 91%, 60%)</code><br>
+                        Icon Bg: <code class="code-val">bg-tokenIn/10</code>
+                    </div>
+
+                    <div class="border-l-2 border-purple-400 pl-3">
+                        <strong class="text-purple-400 block mb-1">Output Token</strong>
+                        Color: <code class="code-val text-purple-400">hsl(270, 95%, 65%)</code><br>
+                        Icon Bg: <code class="code-val">bg-tokenOut/10</code>
+                    </div>
+
+                    <div class="border-l-2 border-green-500 pl-3">
+                        <strong class="text-green-500 block mb-1">Cache Write</strong>
+                        Color: <code class="code-val text-green-500">hsl(142, 71%, 45%)</code><br>
+                        Icon Bg: <code class="code-val">bg-tokenCache/10</code>
+                    </div>
+
+                    <div class="border-l-2 border-orange-500 pl-3">
+                        <strong class="text-orange-500 block mb-1">Cache Read (Hit)</strong>
+                        Color: <code class="code-val text-orange-500">hsl(21, 90%, 48%)</code><br>
+                        Icon Bg: <code class="code-val">bg-accent/10</code>
+                    </div>
+
+                    <p class="mt-2">Card Structure:</p>
+                    <code class="code-val block">flex items-center gap-3 p-3</code>
+                    <p>Icon Size:</p>
+                    <code class="code-val block">w-8 h-8 rounded-md flex-center</code>
+                </div>
+            </section>
+
+            <!-- Row 3 Specs -->
+            <section>
+                <h3 class="text-sm font-bold text-white mb-3">4. Charts & Lists (Row 3)</h3>
+                <div class="space-y-3 text-xs text-zinc-400">
+                    <div>
+                        <div class="spec-label">Chart Area</div>
+                        <p class="mb-1">Height: <code class="code-val">h-[300px]</code>. Grid Lines: <code class="code-val">bg-white/20 opacity-20</code>.</p>
+                        <p>Bar Style: <code class="code-val">rounded-t-sm bg-white/5 hover:bg-white/10</code>.</p>
+                        <p>Active Bar: <code class="code-val">bg-accent hover:opacity-90 shadow-glow</code>.</p>
+                    </div>
+                    <div>
+                        <div class="spec-label">Cost List</div>
+                        <p>Header: <code class="code-val">bg-white/5 border-b border-border</code>.</p>
+                        <p>Row: <code class="code-val">border-b border-border/50 hover:bg-white/5</code>.</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Row 4 Specs -->
+             <section>
+                <h3 class="text-sm font-bold text-white mb-3">5. Data Table (Row 4)</h3>
+                <div class="space-y-3 text-xs text-zinc-400">
+                    <div>
+                        <div class="spec-label">Table Header</div>
+                        <code class="code-val block">bg-white/5 text-[11px] font-medium text-muted uppercase tracking-wider py-2</code>
+                    </div>
+                    <div>
+                        <div class="spec-label">Badge Style (Model Name)</div>
+                        <code class="code-val block">px-1.5 py-0.5 rounded text-[10px] font-medium border</code>
+                        <p class="mt-1">Example (Sonnet): <code class="code-val">bg-accent/20 text-accent border-accent/20</code></p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
