@@ -107,6 +107,9 @@ pub struct ProviderStats {
     /// 今日缓存读取 Token 数量（Cache Read）
     pub today_cache_read_tokens: i64,
 
+    /// 今日缓存创建 Token 数量（Cache Creation）
+    pub today_cache_creation_tokens: i64,
+
     /// 今日费用（美元）
     pub today_cost_usd: f64,
 
@@ -129,6 +132,7 @@ impl ProviderStats {
             today_input_tokens: 0,
             today_output_tokens: 0,
             today_cache_read_tokens: 0,
+            today_cache_creation_tokens: 0,
             today_cost_usd: 0.0,
             cache_hit_rate: 0.0,
         }

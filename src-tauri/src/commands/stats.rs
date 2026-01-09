@@ -8,7 +8,7 @@
 use tauri::State;
 
 use crate::db::Repository;
-use crate::models::{DailyActivity, ProviderStats, StatsCache};
+use crate::models::{DailyActivity, ProviderStats, StatsCache, TodayStats};
 
 /// 获取当前统计数据
 #[tauri::command]
@@ -26,8 +26,15 @@ pub async fn get_today_provider_stats(
     db.get_today_provider_stats().map_err(|e| e.to_string())
 }
 
-/// 获取每日活动记录
+/// 获取今日汇总统计
 #[tauri::command]
+pub async fn get_today_stats(db: State<'_, Repository>) -> Result<TodayStats, String> {
+    println!("IPC 调用: get_today_stats");
+    db.get_today_stats().map_err(|e| e.to_string())
+}
+
+/// 获取每日活动记录
+#[tauri::command(rename_all = "camelCase")]
 pub async fn get_daily_activities(
     db: State<'_, Repository>,
     start_date: String,

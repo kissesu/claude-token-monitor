@@ -11,5 +11,5 @@ pub mod message;
 
 // 重新导出所有公共类型
 pub use provider::{Provider, ProviderStats};
-pub use stats::{ModelUsage, StatsCache, DailyActivity};
+pub use stats::{ModelUsage, StatsCache, DailyActivity, TodayStats};
 pub use message::{MessageRecord, MessageUsage};

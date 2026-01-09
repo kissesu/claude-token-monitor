@@ -1,38 +1,38 @@
 import { KPIGrid } from '../components/dashboard/KPIGrid';
 import { FlowChart } from '../components/dashboard/FlowChart';
 import { TrafficDetails } from '../components/dashboard/TrafficDetails';
-import { RealTimeLogs } from '../components/dashboard/RealTimeLogs';
+import { ModelUsagePanel } from '../components/dashboard/ModelUsagePanel';
+import { DailyActivityPanel } from '../components/dashboard/DailyActivityPanel';
 
 export function Dashboard() {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 h-full pb-6">
+    <div className="flex flex-col gap-8 h-full overflow-y-auto pr-2 custom-scrollbar pb-6">
       
-      {/* 左侧区域 (2/3 宽度) */}
-      <div className="xl:col-span-2 flex flex-col gap-8 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
-        
-        {/* KPI 卡片行 */}
-        <section className="shrink-0">
-          <KPIGrid />
-        </section>
+      {/* KPI 核心指标 */}
+      <section className="shrink-0">
+        <KPIGrid />
+      </section>
 
-        {/* 流量详情行 */}
-        <section className="shrink-0">
+      {/* 流量详情与趋势图表 */}
+      <section className="grid grid-cols-1 xl:grid-cols-4 gap-8 shrink-0">
+        {/* 流量详情：横向排列的卡片 */}
+        <div className="xl:col-span-4">
           <TrafficDetails />
-        </section>
+        </div>
         
-        {/* 使用趋势图表行 */}
-        <section className="shrink-0">
+        {/* 使用趋势：全宽图表 */}
+        <div className="xl:col-span-4 h-[22rem]">
            <FlowChart />
-        </section>
-        
-        <div className="flex-1"></div>
-      </div>
+        </div>
+      </section>
 
-      {/* 右侧区域 (1/3 宽度) */}
-      <div className="xl:col-span-1 h-full min-h-0">
-        <RealTimeLogs />
-      </div>
-
+      {/* 详细数据表格 */}
+      <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 shrink-0">
+         <ModelUsagePanel />
+         <DailyActivityPanel />
+      </section>
+      
+      <div className="flex-1"></div>
     </div>
   );
 }

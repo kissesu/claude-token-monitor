@@ -1,4 +1,4 @@
-import { StatsCache, Provider, DailyActivity } from './tauri';
+import { StatsCache, Provider, DailyActivity, ProviderStats, TodayStats } from './tauri';
 
 export interface LogEntry {
   id: string;
@@ -12,16 +12,11 @@ export interface AppState {
   // Stats
   stats: StatsCache | null;
   dailyActivities: DailyActivity[];
-  todayStats: {
-    input_tokens: number;
-    output_tokens: number;
-    cache_read_tokens: number;
-    cost_usd: number;
-    cache_hit_rate: number;
-  } | null;
+  todayStats: TodayStats | null;
   
   // Providers
   providers: Provider[];
+  providerStats: ProviderStats[];
   activeProviderId: number | null;
   
   // Logs
@@ -34,6 +29,9 @@ export interface AppState {
   // Actions
   fetchStats: () => Promise<void>;
   fetchProviders: () => Promise<void>;
+  updateProviderName: (id: number, name: string) => Promise<void>;
+  addProvider: (apiKey: string, name?: string) => Promise<void>;
+  deleteProvider: (id: number) => Promise<void>;
   addLog: (log: LogEntry) => void;
   setError: (error: string | null) => void;
 }

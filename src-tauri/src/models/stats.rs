@@ -111,6 +111,30 @@ pub struct StatsCache {
     pub updated_at: String,
 }
 
+/// 今日统计汇总
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TodayStats {
+    pub input_tokens: i64,
+    pub output_tokens: i64,
+    pub cache_read_tokens: i64,
+    pub cache_creation_tokens: i64,
+    pub cost_usd: f64,
+    pub session_count: i64,
+    pub message_count: i64,
+    pub cache_hit_rate: f64,
+}
+
+impl TodayStats {
+    pub fn update_cache_hit_rate(&mut self) {
+        let total_tokens = self.cache_read_tokens + self.input_tokens;
+        if total_tokens > 0 {
+            self.cache_hit_rate = self.cache_read_tokens as f64 / total_tokens as f64;
+        } else {
+            self.cache_hit_rate = 0.0;
+        }
+    }
+}
+
 impl Default for StatsCache {
     /// 创建默认的统计缓存
     ///

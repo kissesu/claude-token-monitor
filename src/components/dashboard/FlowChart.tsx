@@ -10,7 +10,7 @@ export function FlowChart() {
   const maxTotal = activityTotals.length > 0 ? Math.max(...activityTotals, 1) : 1;
 
   return (
-    <div className="bento-card p-6 h-[18.75rem] animate-slide-up delay-300 flex flex-col">
+    <div className="bento-card p-6 h-full animate-slide-up delay-300 flex flex-col">
       <div className="flex items-center justify-between mb-6 shrink-0">
         <h3 className="font-display text-sm font-medium text-primary">使用趋势</h3>
         <div className="flex gap-4">

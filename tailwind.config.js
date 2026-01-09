@@ -10,18 +10,18 @@ export default {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
-        // Obsidian Theme
-        bg: "#09090b",       
-        panel: "#121215",    
-        border: "#27272a",
-        primary: "#FFFFFF",
-        secondary: "#A1A1AA",
+        // 使用函数式定义以确保透明度支持 (opacity modifiers) 正常工作
+        bg: ({ opacityValue }) => `rgb(var(--color-bg) / ${opacityValue ?? 1})`,
+        panel: ({ opacityValue }) => `rgb(var(--color-panel) / ${opacityValue ?? 1})`,
+        border: ({ opacityValue }) => `rgb(var(--color-border) / ${opacityValue ?? 1})`,
+        primary: ({ opacityValue }) => `rgb(var(--color-primary) / ${opacityValue ?? 1})`,
+        secondary: ({ opacityValue }) => `rgb(var(--color-secondary) / ${opacityValue ?? 1})`,
+        neonPrimary: ({ opacityValue }) => `rgb(var(--color-neon-primary) / ${opacityValue ?? 1})`,
         
-        // Functional Colors (Neon) - NO ORANGE
-        neonPrimary: "#6366f1", // Electric Indigo (Primary Brand)
-        neonBlue: "#3B82F6",    // Input
-        neonPurple: "#A855F7",  // Output
-        neonGreen: "#10B981",   // Cache
+        // Functional Neon Colors
+        neonBlue: "#3B82F6",    
+        neonPurple: "#A855F7",  
+        neonGreen: "#10B981",   
       },
       backgroundImage: {
         'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",

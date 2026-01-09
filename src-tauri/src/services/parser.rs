@@ -30,10 +30,14 @@ pub struct Settings {
 pub fn parse_settings(content: &str) -> Result<Settings, ParserError> {
     let value: Value = serde_json::from_str(content)?;
 
+    let env_value = value.get("env").cloned().unwrap_or(Value::Null);
+
     let api_key = value
         .get("ANTHROPIC_AUTH_TOKEN")
         .and_then(|v| v.as_str())
         .or_else(|| value.get("anthropic_auth_token").and_then(|v| v.as_str()))
+        .or_else(|| env_value.get("ANTHROPIC_AUTH_TOKEN").and_then(|v| v.as_str()))
+        .or_else(|| env_value.get("anthropic_auth_token").and_then(|v| v.as_str()))
         .ok_or(ParserError::MissingApiKey)?
         .to_string();
 
@@ -41,6 +45,8 @@ pub fn parse_settings(content: &str) -> Result<Settings, ParserError> {
         .get("ANTHROPIC_BASE_URL")
         .and_then(|v| v.as_str())
         .or_else(|| value.get("anthropic_base_url").and_then(|v| v.as_str()))
+        .or_else(|| env_value.get("ANTHROPIC_BASE_URL").and_then(|v| v.as_str()))
+        .or_else(|| env_value.get("anthropic_base_url").and_then(|v| v.as_str()))
         .map(|v| v.to_string());
 
     Ok(Settings { api_key, base_url })
@@ -57,13 +63,20 @@ pub fn parse_jsonl_line(line: &str) -> Result<Option<MessageRecord>, ParserError
         return Ok(None);
     }
 
-    let session_id = extract_string(&value, &["session_id", "conversation_id", "chat_id"])
+    let session_id = extract_string(
+        &value,
+        &["session_id", "sessionId", "conversation_id", "chat_id"],
+    )
         .unwrap_or_else(|| "unknown".to_string());
 
     let created_at = extract_string(&value, &["created_at", "timestamp", "message.created_at"])
         .unwrap_or_else(|| Utc::now().to_rfc3339());
 
-    let usage_value = value.get("usage").cloned().unwrap_or(Value::Null);
+    let usage_value = value
+        .get("usage")
+        .cloned()
+        .or_else(|| value.get("message").and_then(|msg| msg.get("usage")).cloned())
+        .unwrap_or(Value::Null);
     let usage = MessageUsage {
         input_tokens: extract_i64(&usage_value, &["input_tokens", "prompt_tokens"]),
         output_tokens: extract_i64(&usage_value, &["output_tokens", "completion_tokens"]),

@@ -5,7 +5,7 @@ export function RealTimeLogs() {
 
   return (
     <div className="bento-card h-full flex flex-col overflow-hidden animate-slide-up delay-400">
-      <div className="px-5 py-4 border-b border-border/50 flex items-center justify-between shrink-0">
+      <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
         <h3 className="font-display text-sm font-medium text-primary">实时日志</h3>
         <span className="text-[10px] font-mono text-secondary/50">LATEST 50</span>
       </div>
@@ -20,7 +20,7 @@ export function RealTimeLogs() {
               <th className="px-4 py-2 font-medium text-right w-20">费用</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/30">
+          <tbody className="divide-y divide-border">
             {logs.map((log) => (
               <tr key={log.id} className="group hover:bg-white/5 transition-colors">
                 <td className="px-4 py-2.5 font-mono text-xs text-secondary whitespace-nowrap">

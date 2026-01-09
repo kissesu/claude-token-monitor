@@ -73,9 +73,12 @@ pub fn run() {
             greet,
             commands::stats::get_current_stats,
             commands::stats::get_today_provider_stats,
+            commands::stats::get_today_stats,
             commands::stats::get_daily_activities,
             commands::provider::get_providers,
             commands::provider::update_provider_name,
+            commands::provider::add_provider,
+            commands::provider::delete_provider,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running Tauri application");

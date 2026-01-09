@@ -8,12 +8,12 @@
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
-use chrono::Utc;
+use chrono::{Local, Utc};
 use rusqlite::{params, Connection, OptionalExtension};
 use thiserror::Error;
 
 use crate::db::migrations::apply_migrations;
-use crate::models::{DailyActivity, ModelUsage, Provider, ProviderStats, StatsCache};
+use crate::models::{DailyActivity, ModelUsage, Provider, ProviderStats, StatsCache, TodayStats};
 
 #[derive(Error, Debug)]
 pub enum RepositoryError {
@@ -108,6 +108,51 @@ impl Repository {
         Ok(new_provider)
     }
 
+    pub fn create_provider(
+        &self,
+        api_key: &str,
+        display_name: Option<String>,
+    ) -> Result<Provider, RepositoryError> {
+        let now = Utc::now().to_rfc3339();
+        let conn = self.connection()?;
+
+        let existing = self.get_provider_by_hash(&conn, api_key)?;
+
+        if let Some(mut provider) = existing {
+            if let Some(name) = display_name {
+                conn.execute(
+                    "UPDATE providers SET display_name = ?1 WHERE id = ?2",
+                    params![name, provider.id],
+                )?;
+                provider.display_name = Some(name);
+            }
+            return Ok(provider);
+        }
+
+        let mut new_provider = Provider::new(api_key, display_name, None);
+        // 手动添加的默认为非活跃，避免干扰当前 CLI 状态
+        new_provider.is_active = false;
+        new_provider.first_seen_at = now.clone();
+        new_provider.last_seen_at = now;
+
+        conn.execute(
+            "INSERT INTO providers (api_key_hash, api_key_prefix, display_name, base_url, is_active, first_seen_at, last_seen_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            params![
+                new_provider.api_key_hash,
+                new_provider.api_key_prefix,
+                new_provider.display_name,
+                new_provider.base_url,
+                0, // is_active = false
+                new_provider.first_seen_at,
+                new_provider.last_seen_at
+            ],
+        )?;
+
+        new_provider.id = conn.last_insert_rowid();
+        Ok(new_provider)
+    }
+
     pub fn get_all_providers(&self, active_only: bool) -> Result<Vec<Provider>, RepositoryError> {
         let conn = self.connection()?;
         let mut providers = Vec::new();
@@ -157,12 +202,32 @@ impl Repository {
         Ok(())
     }
 
+    pub fn delete_provider(&self, provider_id: i64) -> Result<(), RepositoryError> {
+        let conn = self.connection()?;
+        conn.execute("DELETE FROM message_usage WHERE provider_id = ?1", params![provider_id])?;
+        conn.execute("DELETE FROM daily_stats WHERE provider_id = ?1", params![provider_id])?;
+        conn.execute("DELETE FROM provider_switch_logs WHERE provider_id = ?1", params![provider_id])?;
+        conn.execute("DELETE FROM providers WHERE id = ?1", params![provider_id])?;
+        Ok(())
+    }
+
     pub fn insert_message_usage(
         &self,
         provider_id: i64,
         record: &crate::models::MessageRecord,
     ) -> Result<(), RepositoryError> {
         let conn = self.connection()?;
+
+        let message_exists: Option<i64> = conn
+            .query_row(
+                "SELECT 1 FROM message_usage WHERE provider_id = ?1 AND message_id = ?2 LIMIT 1",
+                params![provider_id, record.message_id],
+                |row| row.get(0),
+            )
+            .optional()?;
+        if message_exists.is_some() {
+            return Ok(());
+        }
 
         let date = extract_date(&record.created_at);
         let session_exists: Option<i64> = conn
@@ -216,6 +281,30 @@ impl Repository {
         )?;
 
         Ok(())
+    }
+
+    pub fn get_active_provider(&self) -> Result<Option<Provider>, RepositoryError> {
+        let conn = self.connection()?;
+
+        conn.query_row(
+            "SELECT id, api_key_hash, api_key_prefix, display_name, base_url, is_active, first_seen_at, last_seen_at
+             FROM providers WHERE is_active = 1 ORDER BY last_seen_at DESC LIMIT 1",
+            [],
+            |row| {
+                Ok(Provider {
+                    id: row.get(0)?,
+                    api_key_hash: row.get(1)?,
+                    api_key_prefix: row.get(2)?,
+                    display_name: row.get(3)?,
+                    base_url: row.get(4)?,
+                    is_active: row.get::<_, i64>(5)? == 1,
+                    first_seen_at: row.get(6)?,
+                    last_seen_at: row.get(7)?,
+                })
+            },
+        )
+        .optional()
+        .map_err(RepositoryError::from)
     }
 
     pub fn get_current_stats(&self) -> Result<StatsCache, RepositoryError> {
@@ -283,7 +372,7 @@ impl Repository {
 
     pub fn get_today_provider_stats(&self) -> Result<Vec<ProviderStats>, RepositoryError> {
         let conn = self.connection()?;
-        let today = Utc::now().date_naive().to_string();
+        let today = Local::now().date_naive().to_string();
 
         let mut stmt = conn.prepare(
             "SELECT
@@ -291,6 +380,7 @@ impl Repository {
                 COALESCE(d.total_input_tokens, 0),
                 COALESCE(d.total_output_tokens, 0),
                 COALESCE(d.total_cache_read_tokens, 0),
+                COALESCE(d.total_cache_creation_tokens, 0),
                 COALESCE(d.total_cost_usd, 0)
              FROM providers p
              LEFT JOIN daily_stats d ON p.id = d.provider_id AND d.date = ?1
@@ -313,7 +403,8 @@ impl Repository {
             stats.today_input_tokens = row.get(8)?;
             stats.today_output_tokens = row.get(9)?;
             stats.today_cache_read_tokens = row.get(10)?;
-            stats.today_cost_usd = row.get(11)?;
+            stats.today_cache_creation_tokens = row.get(11)?;
+            stats.today_cost_usd = row.get(12)?;
             stats.update_cache_hit_rate();
 
             Ok(stats)
@@ -325,6 +416,49 @@ impl Repository {
         }
 
         Ok(result)
+    }
+
+    pub fn get_today_stats(&self) -> Result<TodayStats, RepositoryError> {
+        let conn = self.connection()?;
+        let today = Local::now().date_naive().to_string();
+
+        let mut stmt = conn.prepare(
+            "SELECT
+                COALESCE(SUM(input_tokens), 0),
+                COALESCE(SUM(output_tokens), 0),
+                COALESCE(SUM(cache_read_tokens), 0),
+                COALESCE(SUM(cache_creation_tokens), 0),
+                COALESCE(SUM(cost_usd), 0),
+                COALESCE(COUNT(DISTINCT session_id), 0),
+                COALESCE(COUNT(*), 0)
+             FROM message_usage
+             WHERE date(created_at, 'localtime') = ?1",
+        )?;
+
+        let totals: (i64, i64, i64, i64, f64, i64, i64) = stmt.query_row(params![today], |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
+                row.get(6)?,
+            ))
+        })?;
+
+        let mut stats = TodayStats {
+            input_tokens: totals.0,
+            output_tokens: totals.1,
+            cache_read_tokens: totals.2,
+            cache_creation_tokens: totals.3,
+            cost_usd: totals.4,
+            session_count: totals.5,
+            message_count: totals.6,
+            cache_hit_rate: 0.0,
+        };
+        stats.update_cache_hit_rate();
+        Ok(stats)
     }
 
     pub fn get_daily_activities(
@@ -398,9 +532,9 @@ impl Repository {
 
 fn extract_date(iso: &str) -> String {
     if let Ok(parsed) = chrono::DateTime::parse_from_rfc3339(iso) {
-        return parsed.date_naive().to_string();
+        return parsed.with_timezone(&Local).date_naive().to_string();
     }
-    Utc::now().date_naive().to_string()
+    Local::now().date_naive().to_string()
 }
 
 #[cfg(test)]
@@ -448,7 +582,7 @@ mod tests {
             "session-1".to_string(),
             "message-1".to_string(),
             "claude-3-opus".to_string(),
-            Utc::now().to_rfc3339(),
+            Local::now().to_rfc3339(),
             MessageUsage {
                 input_tokens: 10,
                 output_tokens: 5,
@@ -461,7 +595,7 @@ mod tests {
         repo.insert_message_usage(provider.id, &record)
             .expect("insert");
 
-        let today = Utc::now().date_naive().to_string();
+        let today = Local::now().date_naive().to_string();
         let activities = repo
             .get_daily_activities(&today, &today)
             .expect("activities");

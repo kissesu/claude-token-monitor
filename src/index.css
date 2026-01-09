@@ -2,9 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Default Light Mode Colors */
+    --color-bg: 243 244 246;
+    --color-panel: 255 255 255;
+    --color-border: 229 231 235;
+    --color-primary: 17 24 39;
+    --color-secondary: 107 114 128;
+    --color-neon-primary: 99 102 241;
+  }
+
+  .dark {
+    /* Obsidian Theme (Dark Mode) */
+    --color-bg: 9 9 11;
+    --color-panel: 18 18 21;
+    --color-border: 24 24 27;
+    --color-primary: 255 255 255;
+    --color-secondary: 161 161 170;
+    --color-neon-primary: 99 102 241;
+  }
+
+  /* 确保 body 使用这些变量 */
+  body {
+    @apply bg-bg text-secondary;
+    /* 隐藏所有浏览器的滚动条 */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* 隐藏所有 Webkit 浏览器的滚动条 */
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
 @layer components {
   .bento-card {
-    @apply bg-panel border border-border/50 rounded-xl relative overflow-hidden transition-all duration-300 hover:border-white/10;
+    @apply bg-panel border border-border rounded-xl relative overflow-hidden transition-all duration-300 hover:border-black/5 dark:hover:border-white/10;
   }
 }
 
@@ -14,31 +49,13 @@
   .delay-300 { animation-delay: 300ms; }
   .delay-400 { animation-delay: 400ms; }
 
-  /* 隐藏滚动条但允许滚动 */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-}
-
-/* Custom Scrollbar (Global default) */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 2px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 2px;
 }
 
 .bento-card::after {
@@ -48,6 +65,9 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
   opacity: 0.5;
+}
+.dark .bento-card::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
 }

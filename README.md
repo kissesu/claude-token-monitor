@@ -146,8 +146,8 @@ pnpm tauri build
 - [ ] Phase 1: Rust 后端核心 - 文件监控、解析、数据库
 - [ ] Phase 2: IPC 通信层 - Commands + Events
 - [x] Phase 3: React 基础架构 - 类型、Store、布局
-- [ ] Phase 4: 核心数据展示 - StatCard、表格、实时更新
-- [ ] Phase 5: 供应商功能 - 多供应商区分统计
+- [x] Phase 4: 核心数据展示 - StatCard、表格、实时更新
+- [x] Phase 5: 供应商功能 - 多供应商区分统计
 - [ ] Phase 6: 图表可视化 - 趋势图、饼图、热力图
 - [ ] Phase 7: 测试与打包 - 跨平台构建
 
