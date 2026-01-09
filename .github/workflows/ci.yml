@@ -1,9 +1,7 @@
-/**
- * @file ci.yml
- * @description GitHub Actions CI 工作流 - 代码检查、测试、构建验证
- * @author Atlas.oi
- * @date 2026-01-07
- */
+# @file ci.yml
+# @description GitHub Actions CI 工作流 - 代码检查、测试、构建验证
+# @author Atlas.oi
+# @date 2026-01-07
 
 name: CI
 
