@@ -12,7 +12,7 @@ import { useAppStore } from '../store';
 import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { ErrorMessage } from '../components/common/Feedback';
-import { ConfirmDialog, AlertDialog } from '../components/common/Dialog';
+import { Dialog, ConfirmDialog, AlertDialog } from '../components/common/Dialog';
 
 export function Providers() {
   const { providerStats, activeProviderId, updateProviderName, addProvider, deleteProvider, error, setError } = useAppStore();
@@ -31,6 +31,8 @@ export function Providers() {
   // Dialog state
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; providerId: number | null }>({ open: false, providerId: null });
   const [alertState, setAlertState] = useState<{ open: boolean; title: string; message: string }>({ open: false, title: '', message: '' });
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [detailProviderId, setDetailProviderId] = useState<number | null>(null);
 
   useEffect(() => {
     if (menuOpenId === null) return;
@@ -112,8 +114,10 @@ export function Providers() {
   const handleCopy = (text: string) => {
     setError(null);
     navigator.clipboard.writeText(text).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
     }).catch(err => {
-        setError(err instanceof Error ? err.message : '复制失败');
+      setError(err instanceof Error ? err.message : '复制失败');
     });
     setMenuOpenId(null);
   };
@@ -121,6 +125,13 @@ export function Providers() {
   return (
     <div className="h-full flex flex-col gap-8 overflow-y-auto pr-2 custom-scrollbar relative">
       {error && <ErrorMessage message={error} />}
+
+      {/* 复制成功提示 */}
+      {copySuccess && (
+        <div className="fixed top-20 right-8 z-50 px-4 py-2 bg-emerald-500/90 text-white text-sm rounded-lg shadow-lg animate-fade-in">
+          已复制到剪切板
+        </div>
+      )}
       
       {/* Header Section */}
       <div className="flex items-center justify-between shrink-0 animate-slide-up delay-100">
@@ -260,11 +271,10 @@ export function Providers() {
                         >
                           <Copy className="w-3 h-3" /> 复制前缀
                         </button>
-                        <button 
+                        <button
                           onClick={(e) => {
-                            console.log("点击了详细信息按钮");
                             e.stopPropagation();
-                            // alert(`ID: ${stat.provider.id}\nFirst Seen: ${stat.provider.first_seen_at}\nActive: ${stat.provider.is_active}`);
+                            setDetailProviderId(stat.provider.id);
                             setMenuOpenId(null);
                           }}
                           className="px-3 py-2 text-xs text-left text-secondary hover:text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
@@ -407,6 +417,13 @@ export function Providers() {
         message={alertState.message}
         variant="error"
       />
+
+      {/* 供应商详情对话框 */}
+      <ProviderDetailDialog
+        providerId={detailProviderId}
+        providerStats={providerStats}
+        onClose={() => setDetailProviderId(null)}
+      />
     </div>
   );
 }
@@ -417,4 +434,120 @@ function tryFormatDate(dateStr: string) {
   } catch (e) {
     return '未知';
   }
+}
+
+/**
+ * 供应商详情对话框组件
+ */
+interface ProviderDetailDialogProps {
+  providerId: number | null;
+  providerStats: import('../types/tauri').ProviderStats[];
+  onClose: () => void;
+}
+
+function ProviderDetailDialog({ providerId, providerStats, onClose }: ProviderDetailDialogProps) {
+  if (providerId === null) return null;
+
+  const stat = providerStats.find(p => p.provider.id === providerId);
+  if (!stat) return null;
+
+  const { provider } = stat;
+
+  return (
+    <Dialog open={true} onClose={onClose}>
+      <div className="p-6">
+        {/* 标题栏 */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-neonPrimary/10 flex items-center justify-center border border-neonPrimary/20">
+              <Key className="w-5 h-5 text-neonPrimary" />
+            </div>
+            <div>
+              <h3 className="text-base font-medium text-primary">
+                {provider.display_name || '未命名供应商'}
+              </h3>
+              <p className="text-xs text-secondary font-mono">
+                {provider.api_key_prefix}...
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-secondary hover:text-primary transition-colors p-1"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 详情信息 */}
+        <div className="space-y-4">
+          {/* 基本信息 */}
+          <div className="bg-white/5 rounded-lg p-4 space-y-3">
+            <h4 className="text-xs font-mono uppercase text-secondary mb-3">基本信息</h4>
+            <DetailRow label="ID" value={String(provider.id)} />
+            <DetailRow label="API Key 前缀" value={provider.api_key_prefix} mono />
+            <DetailRow label="API Key 哈希" value={provider.api_key_hash.slice(0, 16) + '...'} mono />
+            <DetailRow label="状态" value={provider.is_active ? '活跃' : '非活跃'} highlight={provider.is_active} />
+            {provider.base_url && (
+              <DetailRow label="Base URL" value={provider.base_url} mono />
+            )}
+          </div>
+
+          {/* 时间信息 */}
+          <div className="bg-white/5 rounded-lg p-4 space-y-3">
+            <h4 className="text-xs font-mono uppercase text-secondary mb-3">时间信息</h4>
+            <DetailRow label="首次发现" value={tryFormatDate(provider.first_seen_at)} />
+            <DetailRow label="最后活跃" value={tryFormatDate(provider.last_seen_at)} />
+          </div>
+
+          {/* 今日统计 */}
+          <div className="bg-white/5 rounded-lg p-4 space-y-3">
+            <h4 className="text-xs font-mono uppercase text-secondary mb-3">今日统计</h4>
+            <DetailRow label="输入 Token" value={formatCompactNumber(stat.today_input_tokens)} />
+            <DetailRow label="输出 Token" value={formatCompactNumber(stat.today_output_tokens)} />
+            <DetailRow label="缓存读取" value={formatCompactNumber(stat.today_cache_read_tokens)} />
+            <DetailRow label="缓存创建" value={formatCompactNumber(stat.today_cache_creation_tokens)} />
+            <DetailRow label="费用 (USD)" value={`$${stat.today_cost_usd.toFixed(4)}`} />
+            <DetailRow label="费用 (CNY)" value={`¥${(stat.today_cost_usd * 7.2).toFixed(2)}`} />
+            <DetailRow label="缓存命中率" value={`${(stat.cache_hit_rate * 100).toFixed(1)}%`} highlight />
+          </div>
+        </div>
+
+        {/* 关闭按钮 */}
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium bg-neonPrimary hover:bg-neonPrimary/90 text-white rounded-lg transition-colors"
+          >
+            关闭
+          </button>
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
+/**
+ * 详情行组件
+ */
+interface DetailRowProps {
+  label: string;
+  value: string;
+  mono?: boolean;
+  highlight?: boolean;
+}
+
+function DetailRow({ label, value, mono, highlight }: DetailRowProps) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-xs text-secondary">{label}</span>
+      <span className={cn(
+        "text-xs",
+        mono ? "font-mono" : "",
+        highlight ? "text-emerald-400" : "text-primary"
+      )}>
+        {value}
+      </span>
+    </div>
+  );
 }

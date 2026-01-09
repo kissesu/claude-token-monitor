@@ -12,7 +12,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  const { providers, activeProviderId } = useAppStore();
+  const { providers, activeProviderId, setActiveProviderId } = useAppStore();
   const [isProviderMenuOpen, setIsProviderMenuOpen] = useState(false);
   const providerMenuRef = useRef<HTMLDivElement>(null);
 
@@ -109,8 +109,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         key={p.id}
                         className="px-3 py-2 text-xs text-left text-primary hover:bg-white/5 flex items-center justify-between transition-colors group"
                         onClick={() => {
-                          // TODO: Implement context switching logic if needed
-                          // For now just close menu as CLI controls active status
+                          setActiveProviderId(p.id);
                           setIsProviderMenuOpen(false);
                         }}
                       >

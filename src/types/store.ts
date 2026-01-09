@@ -34,4 +34,5 @@ export interface AppState {
   deleteProvider: (id: number) => Promise<void>;
   addLog: (log: LogEntry) => void;
   setError: (error: string | null) => void;
+  setActiveProviderId: (id: number | null) => void;
 }

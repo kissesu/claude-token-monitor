@@ -137,5 +137,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({ logs: [log, ...state.logs].slice(0, 50) }));
   },
 
-  setError: (error: string | null) => set({ error })
+  setError: (error: string | null) => set({ error }),
+
+  setActiveProviderId: (id: number | null) => set({ activeProviderId: id })
 }));
