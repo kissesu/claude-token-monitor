@@ -1,14 +1,12 @@
-/**
- * @file release.yml
- * @description GitHub Actions 发布工作流 - 自动版本发布和多平台镜像构建
- * @author Atlas.oi
- * @date 2026-01-07
- *
- * 安全说明：
- * - 不直接处理 git commit messages（不受信任的输入）
- * - 使用环境变量避免命令注入
- * - Release notes 通过 GitHub UI 手动编辑
- */
+# @file release.yml
+# @description GitHub Actions 发布工作流 - 自动版本发布和多平台镜像构建
+# @author Atlas.oi
+# @date 2026-01-07
+#
+# 安全说明：
+# - 不直接处理 git commit messages（不受信任的输入）
+# - 使用环境变量避免命令注入
+# - Release notes 通过 GitHub UI 手动编辑
 
 name: Release
 
