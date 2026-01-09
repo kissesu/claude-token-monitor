@@ -1,6 +1,6 @@
+use chrono::Utc;
 use claude_token_monitor_lib::db::Repository;
 use claude_token_monitor_lib::models::{MessageRecord, MessageUsage};
-use chrono::Utc;
 
 #[test]
 fn test_repository_end_to_end_flow() {

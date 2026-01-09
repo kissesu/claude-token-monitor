@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -74,8 +73,8 @@ impl PricingService {
         let output_cost = output_tokens as f64 / 1_000_000.0 * pricing.output_per_million;
         let cache_read_cost =
             cache_read_tokens as f64 / 1_000_000.0 * pricing.cache_read_per_million;
-        let cache_creation_cost = cache_creation_tokens as f64 / 1_000_000.0
-            * pricing.cache_creation_per_million;
+        let cache_creation_cost =
+            cache_creation_tokens as f64 / 1_000_000.0 * pricing.cache_creation_per_million;
 
         input_cost + output_cost + cache_read_cost + cache_creation_cost
     }

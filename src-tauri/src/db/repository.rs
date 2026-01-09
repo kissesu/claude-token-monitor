@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
@@ -204,9 +203,18 @@ impl Repository {
 
     pub fn delete_provider(&self, provider_id: i64) -> Result<(), RepositoryError> {
         let conn = self.connection()?;
-        conn.execute("DELETE FROM message_usage WHERE provider_id = ?1", params![provider_id])?;
-        conn.execute("DELETE FROM daily_stats WHERE provider_id = ?1", params![provider_id])?;
-        conn.execute("DELETE FROM provider_switch_logs WHERE provider_id = ?1", params![provider_id])?;
+        conn.execute(
+            "DELETE FROM message_usage WHERE provider_id = ?1",
+            params![provider_id],
+        )?;
+        conn.execute(
+            "DELETE FROM daily_stats WHERE provider_id = ?1",
+            params![provider_id],
+        )?;
+        conn.execute(
+            "DELETE FROM provider_switch_logs WHERE provider_id = ?1",
+            params![provider_id],
+        )?;
         conn.execute("DELETE FROM providers WHERE id = ?1", params![provider_id])?;
         Ok(())
     }
@@ -435,17 +443,18 @@ impl Repository {
              WHERE date(created_at, 'localtime') = ?1",
         )?;
 
-        let totals: (i64, i64, i64, i64, f64, i64, i64) = stmt.query_row(params![today], |row| {
-            Ok((
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-                row.get(5)?,
-                row.get(6)?,
-            ))
-        })?;
+        let totals: (i64, i64, i64, i64, f64, i64, i64) =
+            stmt.query_row(params![today], |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                    row.get(5)?,
+                    row.get(6)?,
+                ))
+            })?;
 
         let mut stats = TodayStats {
             input_tokens: totals.0,
@@ -545,9 +554,7 @@ mod tests {
     #[test]
     fn test_repository_insert_and_stats() {
         let repo = Repository::new_in_memory().expect("repo");
-        let provider = repo
-            .upsert_provider("sk-test", None)
-            .expect("provider");
+        let provider = repo.upsert_provider("sk-test", None).expect("provider");
 
         let record = MessageRecord::new(
             "session-1".to_string(),
@@ -574,9 +581,7 @@ mod tests {
     #[test]
     fn test_get_daily_activities() {
         let repo = Repository::new_in_memory().expect("repo");
-        let provider = repo
-            .upsert_provider("sk-test", None)
-            .expect("provider");
+        let provider = repo.upsert_provider("sk-test", None).expect("provider");
 
         let record = MessageRecord::new(
             "session-1".to_string(),

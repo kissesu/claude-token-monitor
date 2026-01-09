@@ -4,8 +4,7 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 pub mod file_watcher;
 pub mod parser;
-pub mod provider_tracker;
 pub mod pricing;
+pub mod provider_tracker;

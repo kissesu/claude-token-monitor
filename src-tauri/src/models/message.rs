@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use serde::{Deserialize, Serialize};
 
 /// 单条消息的 Token 使用记录

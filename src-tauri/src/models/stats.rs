@@ -1,12 +1,11 @@
+use chrono::Utc;
 /**
  * @file stats.rs
  * @description 统计相关数据模型，包含模型使用、缓存统计、每日活动等
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use serde::{Deserialize, Serialize};
-use chrono::Utc;
 
 /// 模型使用统计
 ///
@@ -189,7 +188,11 @@ impl StatsCache {
     /// # 参数
     /// * `model_usage` - 模型使用统计数据
     pub fn add_or_update_model(&mut self, model_usage: ModelUsage) {
-        if let Some(existing) = self.models.iter_mut().find(|m| m.model == model_usage.model) {
+        if let Some(existing) = self
+            .models
+            .iter_mut()
+            .find(|m| m.model == model_usage.model)
+        {
             existing.input_tokens += model_usage.input_tokens;
             existing.output_tokens += model_usage.output_tokens;
             existing.cache_read_tokens += model_usage.cache_read_tokens;

@@ -4,17 +4,12 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use chrono::Utc;
-use rusqlite::{Connection, params};
+use rusqlite::{params, Connection};
 
 use crate::db::schema::{
-    CREATE_SCHEMA_MIGRATIONS_TABLE,
-    CREATE_PROVIDERS_TABLE,
-    CREATE_MESSAGE_USAGE_TABLE,
-    CREATE_DAILY_STATS_TABLE,
-    CREATE_PROVIDER_SWITCH_LOGS_TABLE,
-    CREATE_INDEXES,
+    CREATE_DAILY_STATS_TABLE, CREATE_INDEXES, CREATE_MESSAGE_USAGE_TABLE, CREATE_PROVIDERS_TABLE,
+    CREATE_PROVIDER_SWITCH_LOGS_TABLE, CREATE_SCHEMA_MIGRATIONS_TABLE,
 };
 
 #[derive(Debug, Clone)]
@@ -25,15 +20,13 @@ pub struct Migration {
 }
 
 pub fn all_migrations() -> Vec<Migration> {
-    vec![
-        Migration {
-            version: 1,
-            description: "init core tables",
-            sql: r#"
+    vec![Migration {
+        version: 1,
+        description: "init core tables",
+        sql: r#"
                 -- 核心表
                 "#,
-        },
-    ]
+    }]
 }
 
 pub fn apply_migrations(conn: &Connection) -> Result<(), rusqlite::Error> {
@@ -59,7 +52,11 @@ pub fn apply_migrations(conn: &Connection) -> Result<(), rusqlite::Error> {
 
         conn.execute(
             "INSERT INTO schema_migrations (version, description, applied_at) VALUES (?1, ?2, ?3)",
-            params![migration.version, migration.description, Utc::now().to_rfc3339()],
+            params![
+                migration.version,
+                migration.description,
+                Utc::now().to_rfc3339()
+            ],
         )?;
     }
 

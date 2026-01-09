@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use notify::{Event, RecursiveMode, Watcher};
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Emitter, Manager};
@@ -37,27 +36,23 @@ impl FileWatcher {
             .join(".claude");
 
         let app_handle = app.clone();
-        let watcher = notify::recommended_watcher(move |event: Result<Event, _>| {
-            match event {
-                Ok(event) => {
-                    match event.kind {
-                        notify::EventKind::Modify(_) | notify::EventKind::Create(_) => {
-                            println!("检测到文件变更: {:?}", event.paths);
-                            let paths = event.paths.clone();
-                            let _ = app_handle.emit("file-changed", paths.clone());
-                            let app_handle = app_handle.clone();
-                            std::thread::spawn(move || {
-                                if let Err(error) = handle_file_changes(&app_handle, &paths) {
-                                    eprintln!("文件变更处理失败: {}", error);
-                                }
-                            });
+        let watcher = notify::recommended_watcher(move |event: Result<Event, _>| match event {
+            Ok(event) => match event.kind {
+                notify::EventKind::Modify(_) | notify::EventKind::Create(_) => {
+                    println!("检测到文件变更: {:?}", event.paths);
+                    let paths = event.paths.clone();
+                    let _ = app_handle.emit("file-changed", paths.clone());
+                    let app_handle = app_handle.clone();
+                    std::thread::spawn(move || {
+                        if let Err(error) = handle_file_changes(&app_handle, &paths) {
+                            eprintln!("文件变更处理失败: {}", error);
                         }
-                        _ => {}
-                    }
+                    });
                 }
-                Err(e) => {
-                    eprintln!("文件监控事件错误: {}", e);
-                }
+                _ => {}
+            },
+            Err(e) => {
+                eprintln!("文件监控事件错误: {}", e);
             }
         })?;
 
@@ -130,24 +125,22 @@ fn handle_file_changes(app: &AppHandle, paths: &[PathBuf]) -> Result<(), FileWat
     for path in paths {
         if is_settings_file(path) {
             match std::fs::read_to_string(path) {
-                Ok(content) => {
-                    match parse_settings(&content) {
-                        Ok(settings) => {
-                            match repository.upsert_provider(&settings.api_key, settings.base_url) {
-                                Ok(provider) => {
-                                    println!("供应商信息已更新: {}", provider.api_key_prefix);
-                                    updated_provider = Some(provider);
-                                }
-                                Err(e) => {
-                                    eprintln!("供应商更新失败 [{}]: {}", path.display(), e);
-                                }
+                Ok(content) => match parse_settings(&content) {
+                    Ok(settings) => {
+                        match repository.upsert_provider(&settings.api_key, settings.base_url) {
+                            Ok(provider) => {
+                                println!("供应商信息已更新: {}", provider.api_key_prefix);
+                                updated_provider = Some(provider);
+                            }
+                            Err(e) => {
+                                eprintln!("供应商更新失败 [{}]: {}", path.display(), e);
                             }
                         }
-                        Err(e) => {
-                            eprintln!("Settings 解析失败 [{}]: {}", path.display(), e);
-                        }
                     }
-                }
+                    Err(e) => {
+                        eprintln!("Settings 解析失败 [{}]: {}", path.display(), e);
+                    }
+                },
                 Err(e) => {
                     eprintln!("文件读取失败 [{}]: {}", path.display(), e);
                 }

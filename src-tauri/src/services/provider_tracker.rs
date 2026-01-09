@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use crate::db::{Repository, RepositoryError};
 use crate::models::Provider;
 use crate::services::parser::Settings;

@@ -1,13 +1,12 @@
+use chrono::Utc;
 /**
  * @file provider.rs
  * @description 供应商相关数据模型，包含供应商信息和统计数据
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use serde::{Deserialize, Serialize};
-use chrono::Utc;
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 
 /// 供应商信息
 ///
@@ -160,11 +159,7 @@ mod tests {
 
     #[test]
     fn test_provider_new() {
-        let provider = Provider::new(
-            "sk-ant-api-test-key",
-            Some("测试账号".to_string()),
-            None,
-        );
+        let provider = Provider::new("sk-ant-api-test-key", Some("测试账号".to_string()), None);
 
         assert_eq!(provider.api_key_prefix, "sk-ant-a");
         assert_eq!(provider.display_name, Some("测试账号".to_string()));

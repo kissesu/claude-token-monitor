@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use tauri::State;
 
 use crate::db::Repository;

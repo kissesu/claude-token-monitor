@@ -4,13 +4,12 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use std::sync::Mutex;
 
 use tauri::Manager;
 
-pub mod db;
 pub mod commands;
+pub mod db;
 pub mod models;
 pub mod services;
 
@@ -49,18 +48,14 @@ pub fn run() {
                 eprintln!("警告: 无法获取主窗口，应用将继续运行");
             }
 
-            let app_data_dir = app
-                .path()
-                .app_data_dir()
-                .map_err(|e| e.to_string())?;
+            let app_data_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
             let db_path = app_data_dir.join("claude-token-monitor.db");
             let repository = db::Repository::new(&db_path).map_err(|e| e.to_string())?;
             println!("数据库已初始化: {}", db_path.display());
             app.manage(repository);
 
-            let mut watcher =
-                services::file_watcher::FileWatcher::new(app.handle().clone())
-                    .map_err(|e| e.to_string())?;
+            let mut watcher = services::file_watcher::FileWatcher::new(app.handle().clone())
+                .map_err(|e| e.to_string())?;
             watcher.start().map_err(|e| e.to_string())?;
             app.manage(Mutex::new(watcher));
 

@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use tauri::State;
 
 use crate::db::Repository;
@@ -31,20 +30,14 @@ pub async fn add_provider(
     api_key: String,
     display_name: Option<String>,
 ) -> Result<Provider, String> {
-    println!(
-        "IPC 调用: add_provider, display_name={:?}",
-        display_name
-    );
+    println!("IPC 调用: add_provider, display_name={:?}", display_name);
     db.create_provider(&api_key, display_name)
         .map_err(|e| e.to_string())
 }
 
 /// 删除供应商
 #[tauri::command(rename_all = "camelCase")]
-pub async fn delete_provider(
-    db: State<'_, Repository>,
-    provider_id: i64,
-) -> Result<(), String> {
+pub async fn delete_provider(db: State<'_, Repository>, provider_id: i64) -> Result<(), String> {
     println!("IPC 调用: delete_provider, provider_id={}", provider_id);
     db.delete_provider(provider_id).map_err(|e| e.to_string())
 }

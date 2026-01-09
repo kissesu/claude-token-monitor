@@ -4,7 +4,6 @@
  * @author Atlas.oi
  * @date 2026-01-08
  */
-
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -36,8 +35,16 @@ pub fn parse_settings(content: &str) -> Result<Settings, ParserError> {
         .get("ANTHROPIC_AUTH_TOKEN")
         .and_then(|v| v.as_str())
         .or_else(|| value.get("anthropic_auth_token").and_then(|v| v.as_str()))
-        .or_else(|| env_value.get("ANTHROPIC_AUTH_TOKEN").and_then(|v| v.as_str()))
-        .or_else(|| env_value.get("anthropic_auth_token").and_then(|v| v.as_str()))
+        .or_else(|| {
+            env_value
+                .get("ANTHROPIC_AUTH_TOKEN")
+                .and_then(|v| v.as_str())
+        })
+        .or_else(|| {
+            env_value
+                .get("anthropic_auth_token")
+                .and_then(|v| v.as_str())
+        })
         .ok_or(ParserError::MissingApiKey)?
         .to_string();
 
@@ -67,7 +74,7 @@ pub fn parse_jsonl_line(line: &str) -> Result<Option<MessageRecord>, ParserError
         &value,
         &["session_id", "sessionId", "conversation_id", "chat_id"],
     )
-        .unwrap_or_else(|| "unknown".to_string());
+    .unwrap_or_else(|| "unknown".to_string());
 
     let created_at = extract_string(&value, &["created_at", "timestamp", "message.created_at"])
         .unwrap_or_else(|| Utc::now().to_rfc3339());
@@ -75,7 +82,12 @@ pub fn parse_jsonl_line(line: &str) -> Result<Option<MessageRecord>, ParserError
     let usage_value = value
         .get("usage")
         .cloned()
-        .or_else(|| value.get("message").and_then(|msg| msg.get("usage")).cloned())
+        .or_else(|| {
+            value
+                .get("message")
+                .and_then(|msg| msg.get("usage"))
+                .cloned()
+        })
         .unwrap_or(Value::Null);
     let usage = MessageUsage {
         input_tokens: extract_i64(&usage_value, &["input_tokens", "prompt_tokens"]),
