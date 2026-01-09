@@ -17,6 +17,12 @@ pub struct PricingService {
     pricing: HashMap<String, ModelPricing>,
 }
 
+impl Default for PricingService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PricingService {
     pub fn new() -> Self {
         let mut pricing = HashMap::new();
