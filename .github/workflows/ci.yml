@@ -91,6 +91,9 @@ jobs:
         working-directory: src-tauri
         run: cargo fmt --check
 
+      - name: 创建前端构建目录
+        run: mkdir -p dist
+
       - name: 运行 Clippy
         working-directory: src-tauri
         run: cargo clippy -- -D warnings

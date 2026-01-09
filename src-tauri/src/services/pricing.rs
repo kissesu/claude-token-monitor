@@ -1,9 +1,7 @@
-/**
- * @file pricing.rs
- * @description 模型价格计算服务
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file pricing.rs
+//! @description 模型价格计算服务
+//! @author Atlas.oi
+//! @date 2026-01-08
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]

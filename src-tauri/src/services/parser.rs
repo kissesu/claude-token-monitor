@@ -1,9 +1,7 @@
-/**
- * @file parser.rs
- * @description Claude CLI 配置与 JSONL 消息解析服务
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file parser.rs
+//! @description Claude CLI 配置与 JSONL 消息解析服务
+//! @author Atlas.oi
+//! @date 2026-01-08
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

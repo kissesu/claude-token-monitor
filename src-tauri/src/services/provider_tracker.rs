@@ -1,9 +1,7 @@
-/**
- * @file provider_tracker.rs
- * @description 供应商识别与切换追踪服务
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file provider_tracker.rs
+//! @description 供应商识别与切换追踪服务
+//! @author Atlas.oi
+//! @date 2026-01-08
 use crate::db::{Repository, RepositoryError};
 use crate::models::Provider;
 use crate::services::parser::Settings;

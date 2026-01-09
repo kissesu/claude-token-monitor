@@ -1,9 +1,7 @@
-/**
- * @file file_watcher.rs
- * @description 文件监控服务，监听 Claude CLI 数据目录变更
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file file_watcher.rs
+//! @description 文件监控服务，监听 Claude CLI 数据目录变更
+//! @author Atlas.oi
+//! @date 2026-01-08
 use notify::{Event, RecursiveMode, Watcher};
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Emitter, Manager};

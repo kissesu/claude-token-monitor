@@ -1,9 +1,7 @@
-/**
- * @file repository.rs
- * @description 数据仓库层，封装 SQLite 操作
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file repository.rs
+//! @description 数据仓库层，封装 SQLite 操作
+//! @author Atlas.oi
+//! @date 2026-01-08
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 

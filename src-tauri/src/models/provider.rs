@@ -1,10 +1,8 @@
+//! @file provider.rs
+//! @description 供应商相关数据模型，包含供应商信息和统计数据
+//! @author Atlas.oi
+//! @date 2026-01-08
 use chrono::Utc;
-/**
- * @file provider.rs
- * @description 供应商相关数据模型，包含供应商信息和统计数据
- * @author Atlas.oi
- * @date 2026-01-08
- */
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 

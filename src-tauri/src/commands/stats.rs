@@ -1,9 +1,7 @@
-/**
- * @file stats.rs
- * @description 统计相关 Tauri Commands
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file stats.rs
+//! @description 统计相关 Tauri Commands
+//! @author Atlas.oi
+//! @date 2026-01-08
 use tauri::State;
 
 use crate::db::Repository;

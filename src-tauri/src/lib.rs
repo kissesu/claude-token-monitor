@@ -1,9 +1,7 @@
-/**
- * @file Tauri 库入口
- * @description Claude Token Monitor 的 Tauri 库定义和命令注册
- * @author Atlas.oi
- * @date 2026-01-08
- */
+/// @file Tauri 库入口
+/// @description Claude Token Monitor 的 Tauri 库定义和命令注册
+/// @author Atlas.oi
+/// @date 2026-01-08
 use std::sync::Mutex;
 
 use tauri::Manager;

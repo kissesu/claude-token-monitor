@@ -1,10 +1,7 @@
-/**
- * @file schema.rs
- * @description 数据库表结构定义
- * @author Atlas.oi
- * @date 2026-01-08
- */
-
+/// @file schema.rs
+/// @description 数据库表结构定义
+/// @author Atlas.oi
+/// @date 2026-01-08
 pub const CREATE_SCHEMA_MIGRATIONS_TABLE: &str = r#"
 CREATE TABLE IF NOT EXISTS schema_migrations (
     version INTEGER PRIMARY KEY,

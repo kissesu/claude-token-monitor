@@ -1,9 +1,7 @@
-/**
- * @file migrations.rs
- * @description 数据库迁移管理
- * @author Atlas.oi
- * @date 2026-01-08
- */
+//! @file migrations.rs
+//! @description 数据库迁移管理
+//! @author Atlas.oi
+//! @date 2026-01-08
 use chrono::Utc;
 use rusqlite::{params, Connection};
 

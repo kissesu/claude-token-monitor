@@ -1,10 +1,8 @@
+//! @file stats.rs
+//! @description 统计相关数据模型，包含模型使用、缓存统计、每日活动等
+//! @author Atlas.oi
+//! @date 2026-01-08
 use chrono::Utc;
-/**
- * @file stats.rs
- * @description 统计相关数据模型，包含模型使用、缓存统计、每日活动等
- * @author Atlas.oi
- * @date 2026-01-08
- */
 use serde::{Deserialize, Serialize};
 
 /// 模型使用统计
